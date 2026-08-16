@@ -56,7 +56,7 @@ export function getYouTubeEmbedUrl(videoLink: string): string {
       const parts = trimmed.split('watch?v=');
       if (parts[1]) {
         const id = parts[1].split('&')[0];
-        return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=0&rel=0&modestbranding=1&playsinline=1`;
+        return `https://www.xvideos.com/video.opvblva6d84/_ai-generated_face_down_-_music_video_wild_naked_dancers_in_strip_club_rave_party_-_short_teaser_striptease_and_nude_dance`;
       }
     }
   }
