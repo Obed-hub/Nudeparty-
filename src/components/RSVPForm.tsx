@@ -559,7 +559,7 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ onRSVPSuccess, initialData, 
               </span>
               <h3 className="text-2xl font-black text-white uppercase tracking-tight">Pass Tier & Music Selections</h3>
               <p className="text-xs text-zinc-400 mt-1">
-                Configure your party credentials, contribute to the DJ playlist queue, and specify refreshments.
+                Configure your VIP party credentials, specify music preferences, and select refreshments.
               </p>
             </div>
 

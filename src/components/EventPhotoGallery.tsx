@@ -28,7 +28,7 @@ import { RunwayStageBackdrop } from './RunwayStageBackdrop';
 export interface EventPhoto {
   id: string;
   title: string;
-  category: 'runway' | 'vip_lounge' | 'limo_transit' | 'bachelor' | 'atmosphere';
+  category: 'runway' | 'vip_lounge' | 'limo_transit' | 'bachelor';
   categoryLabel: string;
   imageUrl?: string;
   useRunwayBackdrop?: boolean;
@@ -110,21 +110,6 @@ export const EVENT_PHOTOS: EventPhoto[] = [
     attendeesCount: '10 Groomsmen'
   },
   {
-    id: 'photo-5',
-    title: 'Nightclub Laser Spectacle, Laser Canopy & DJ Euphoria',
-    category: 'atmosphere',
-    categoryLabel: 'Crowd Euphoria & Atmosphere',
-    imageUrl: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=1200&auto=format&fit=crop',
-    location: 'Atmosphere Soundstage',
-    eventDate: 'Weekend Peak Hours (1:00 AM - 4:00 AM)',
-    guestReview: 'The energy, high-powered multi-color lasers, and acoustic sound system made it feel like an elite festival combined with world-class cabaret.',
-    guestName: 'Christian V.',
-    guestType: 'VIP All-Access Weekend Pass',
-    rating: 5.0,
-    tags: ['Laser Canopies', 'Club Acoustics', 'High-Energy DJ', 'Peak Midnight Hours'],
-    attendeesCount: '1,200+ Partygoers'
-  },
-  {
     id: 'photo-6',
     title: 'Champagne Sparkler Parade & Velvet Rope Escort',
     category: 'vip_lounge',
@@ -176,8 +161,7 @@ const CATEGORIES = [
   { id: 'runway', label: 'Catwalk & Runway Stages' },
   { id: 'vip_lounge', label: 'VIP Booths & Bottles' },
   { id: 'limo_transit', label: 'Party Buses & Transit' },
-  { id: 'bachelor', label: 'Bachelor Celebrations' },
-  { id: 'atmosphere', label: 'Nightclub Atmosphere' }
+  { id: 'bachelor', label: 'Bachelor Celebrations' }
 ];
 
 export const EventPhotoGallery: React.FC<EventPhotoGalleryProps> = ({
