@@ -48,7 +48,7 @@ export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
     id: 'video-1',
     // PUT ANY VIDEO URL HERE:
     videoUrl: 'https://www.xvideos.com/video.haauuoo5622/club_orgy_chaos_watch_these_girls_go_wild_all_night_long',
-    title: 'High-Energy VIP Stage Production & Atmosphere',
+    title: 'Club Night Gone Wild - Naked Orgy with South Florida's Hottest ',
     tagline: 'Lasers, stage choreography & 100+ dancer welcomes',
     category: 'VIP Stage Showcase',
     badge: '🔥 4K STREAM',
@@ -60,8 +60,8 @@ export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
     id: 'video-2',
     // PUT ANY VIDEO URL HERE:
     videoUrl: 'https://www.xvideos.com/video.hblppbo67ca/realitykings_-_in_the_vip_-_fierce_fucking',
-    title: 'Cinematic VIP Velvet Corridor & Lounges',
-    tagline: 'Discreet bottle service suites and private luxury cabanas',
+    title: '',
+    tagline: 'Dirty Party Girls Go Wild Fucked by Man Meat in VIP Club Bash',
     category: 'Ultra Lounge',
     badge: '💎 CINEMA HD',
     duration: '2:15',
@@ -96,7 +96,7 @@ export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
     id: 'video-5',
     // PUT ANY VIDEO URL HERE:
     videoUrl: 'https://www.xvideos.com/video.halikok996d/night_out_nymphos_flashing_fucking_and_loving_every_second',
-    title: 'Complimentary VIP Chauffeur Transit Ride',
+    title: 'Complimentar',
     tagline: 'Direct luxury pickup from your hotel with zero cover charges',
     category: 'Party Bus Transit',
     badge: '🚐 FREE LIMO',
