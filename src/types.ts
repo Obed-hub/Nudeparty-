@@ -93,6 +93,8 @@ export interface DestinationCity {
   topHotels: HotelLocation[];
   byobAllowed: boolean;
   byobPolicyNote: string;
+  heroVideoUrl?: string; // Any video URL (YouTube, Vimeo, MP4, etc.)
+  nightlifeVideoUrl?: string; // Any video URL for showcase
   limoFleetTypes: string[];
   emergencyHostPhone: string;
   hostName: string;

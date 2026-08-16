@@ -161,18 +161,18 @@ export function App() {
         onOpenCitySelector={() => setIsCitySelectorOpen(true)}
       />
 
-      {/* Nightlife Video Trailers & Teasers Showcase */}
-      <NightlifeVideoShowcase
-        city={selectedCity}
-        onOpenBooking={handleOpenBooking}
-      />
-
       {/* VIP Packages Grid (Calculated in Selected Currency) */}
       <VIPPackagesGrid
         city={selectedCity}
         currency={selectedCurrency}
         onSelectPackage={(pkgId) => handleOpenBooking(pkgId)}
         onOpenHostChat={() => setIsHostChatOpen(true)}
+      />
+
+      {/* Nightlife Video Atmosphere Showcase */}
+      <NightlifeVideoShowcase
+        city={selectedCity}
+        onOpenBooking={handleOpenBooking}
       />
 
       {/* Curated High-Quality Event Photos Gallery & Carousel */}

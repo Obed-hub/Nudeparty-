@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Play, 
-  Sparkles, 
   Film, 
   Flame, 
   Crown, 
@@ -9,204 +8,177 @@ import {
   Shuffle, 
   Maximize2, 
   Minimize2, 
-  Tv, 
   CheckCircle2, 
   ExternalLink,
-  Link as LinkIcon
+  Volume2,
+  VolumeX,
+  RotateCcw
 } from 'lucide-react';
 import { DestinationCity } from '../types';
+import { parseAnyVideoUrl, ParsedVideoResult } from '../utils/universalVideo';
+
+// ==================================================================================
+// 🎬 NIGHTLIFE VIDEO PLAYLIST CONFIGURATION
+// You can edit or replace ANY videoUrl below with ANY video link:
+// - YouTube: 'https://www.youtube.com/watch?v=...' or 'https://youtu.be/...' or Shorts
+// - Direct video file: 'https://example.com/video.mp4' or .webm / .mov
+// - Vimeo: 'https://vimeo.com/...' or 'https://player.vimeo.com/video/...'
+// - Streamable: 'https://streamable.com/...'
+// - Loom: 'https://loom.com/share/...'
+// - Dailymotion, Wistia, TikTok, or raw embed links
+//
+// The app will automatically parse it, extract video IDs, and play it seamlessly!
+// ==================================================================================
+
+export interface VideoShowcaseItem {
+  id: string;
+  videoUrl: string; // <-- PUT ANY VIDEO URL HERE!
+  title: string;
+  tagline: string;
+  category: string;
+  badge?: string;
+  duration?: string;
+  views?: string;
+  description?: string;
+  posterImage?: string; // Optional custom thumbnail/poster
+}
+
+export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
+  {
+    id: 'video-1',
+    // PUT ANY VIDEO URL HERE:
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    title: 'High-Energy VIP Stage Production & Atmosphere',
+    tagline: 'Lasers, stage choreography & 100+ dancer welcomes',
+    category: 'VIP Stage Showcase',
+    badge: '🔥 4K STREAM',
+    duration: '0:15',
+    views: '1.4M views',
+    description: 'Immerse in front-row VIP stage views, laser production, and pulse-pounding sound.'
+  },
+  {
+    id: 'video-2',
+    // PUT ANY VIDEO URL HERE:
+    videoUrl: 'https://player.vimeo.com/video/76979871',
+    title: 'Cinematic VIP Velvet Corridor & Lounges',
+    tagline: 'Discreet bottle service suites and private luxury cabanas',
+    category: 'Ultra Lounge',
+    badge: '💎 CINEMA HD',
+    duration: '2:15',
+    views: '650K views',
+    description: 'Private lounge suites and top-tier hospitality for your whole squad.'
+  },
+  {
+    id: 'video-3',
+    // PUT ANY VIDEO URL HERE:
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    title: 'VIP Bottle Service & High-Roller Atmosphere',
+    tagline: 'Sparkler trains, premium leather booths & champagne service',
+    category: 'Bottle Service',
+    badge: '⚡ VIP SUITE',
+    duration: '0:15',
+    views: '980K views',
+    description: 'Front-row leather booths, sparkler bottle service, and dancer introductions.'
+  },
+  {
+    id: 'video-4',
+    // PUT ANY VIDEO URL HERE:
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+    title: 'Main Room Euphoria & Midnight Countdown',
+    tagline: 'Weekend celebration vibes, confetti drops & party energy',
+    category: 'Main Stage',
+    badge: '✨ MAIN ROOM',
+    duration: '0:15',
+    views: '1.2M views',
+    description: 'Unmatched party energy, master acoustics, and full-room celebrations.'
+  },
+  {
+    id: 'video-5',
+    // PUT ANY VIDEO URL HERE:
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+    title: 'Complimentary VIP Chauffeur Transit Ride',
+    tagline: 'Direct luxury pickup from your hotel with zero cover charges',
+    category: 'Party Bus Transit',
+    badge: '🚐 FREE LIMO',
+    duration: '0:15',
+    views: '840K views',
+    description: 'Step into your private chauffeur party bus with VIP dropoff right at the velvet rope.'
+  }
+];
 
 interface NightlifeVideoShowcaseProps {
   city: DestinationCity;
   onOpenBooking: () => void;
 }
 
-export interface YouTubeTeaser {
-  id: string;
-  videoUrl: string; // Direct YouTube video link
-  title: string;
-  tagline: string;
-  category: string;
-  badge: string;
-  duration: string;
-  views: string;
-  description: string;
-}
-
-// Convert any YouTube video link (watch?v=, youtu.be, shorts, embed) into an embeddable player URL
-export function getYouTubeEmbedUrl(videoLink: string): string {
-  if (!videoLink) return '';
-  const trimmed = videoLink.trim();
-
-  // If already an embed URL, ensure parameters are attached
-  if (trimmed.includes('youtube.com/embed/') || trimmed.includes('youtube-nocookie.com/embed/')) {
-    const base = trimmed.split('?')[0];
-    return `${base}?autoplay=1&mute=0&rel=0&modestbranding=1&playsinline=1`;
-  }
-
-  // Handle standard watch URL: youtube.com/watch?v=ID
-  if (trimmed.includes('youtube.com/watch')) {
-    try {
-      const urlObj = new URL(trimmed.startsWith('http') ? trimmed : `https://${trimmed}`);
-      const v = urlObj.searchParams.get('v');
-      if (v) {
-        return `https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=0&rel=0&modestbranding=1&playsinline=1`;
-      }
-    } catch {
-      const parts = trimmed.split('watch?v=');
-      if (parts[1]) {
-        const id = parts[1].split('&')[0];
-        return `https://www.xvideos.com/video.opvblva6d84/_ai-generated_face_down_-_music_video_wild_naked_dancers_in_strip_club_rave_party_-_short_teaser_striptease_and_nude_dance`;
-      }
-    }
-  }
-
-  // Handle short URL: youtu.be/ID
-  if (trimmed.includes('youtu.be/')) {
-    const parts = trimmed.split('youtu.be/');
-    if (parts[1]) {
-      const id = parts[1].split('?')[0].split('/')[0];
-      return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=0&rel=0&modestbranding=1&playsinline=1`;
-    }
-  }
-
-  // Handle shorts: youtube.com/shorts/ID
-  if (trimmed.includes('youtube.com/shorts/')) {
-    const parts = trimmed.split('youtube.com/shorts/');
-    if (parts[1]) {
-      const id = parts[1].split('?')[0].split('/')[0];
-      return `https://www.xvideos.com/video.ooevdao9269/_ai-generated_elite_strip_club_slave_girls_obedient_naked_dancers_sex_rave_watch_with_sound_music_video`;
-    }
-  }
-
-  // Fallback: If just a video ID was entered, construct the embed URL directly
-  return `https://www.youtube-nocookie.com/embed/${trimmed}?autoplay=1&mute=0&rel=0&modestbranding=1&playsinline=1`;
-}
-
-// Helper to retrieve thumbnail from YouTube video link
-export function getYouTubeThumbnailUrl(videoLink: string): string {
-  if (!videoLink) return '';
-  const embedUrl = getYouTubeEmbedUrl(videoLink);
-  const match = embedUrl.match(/embed\/([^?]+)/);
-  if (match && match[1]) {
-    return `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`;
-  }
-  return 'https://www.xvideos.com/video.halpitd4e9c/these_party_girls_get_dirtier_than_south_florida_s_wildest_nights';
-}
-
-export const YOUTUBE_NIGHTLIFE_VIDEOS: YouTubeTeaser[] = [
-  {
-    id: 'yt-vegas-lights',
-    videoUrl: 'https://www.xvideos.com/video.opvblva6d84/_ai-generated_face_down_-_music_video_wild_naked_dancers_in_strip_club_rave_party_-_short_teaser_striptease_and_nude_dance',
-    title: 'Neon Nights & VIP Strip Atmosphere',
-    tagline: 'High-energy neon lighting, stage choreography, laser shows & 100+ performers',
-    category: 'VIP Stage Show',
-    badge: '⚡ ULTRA NEON',
-    duration: '3:20',
-    views: '840K views',
-    description: 'Immerse in late-night high-octane vibes, dazzling neon aesthetics, and front-row stage energy.'
-  },
-  {
-    id: 'yt-masquerade',
-    videoUrl: 'https://www.xvideos.com/video.oppvftb40d9/_ai-generated_-_music_video_close_contact_-_naked_dancers_strip_club_striptease_and_naked_dances_watch_with_sound_',
-    title: 'VIP Masquerade & Ultra Cabaret Suite',
-    tagline: 'Anonymous VIP booths, sparkler bottle service, private cabanas & glamour',
-    category: 'Ultra Lounge',
-    badge: '🎭 MASQUERADE',
-    duration: '3:45',
-    views: '1.2M views',
-    description: 'Chic lounge interiors, masquerade mystery, and top-tier hospitality for your entire squad.'
-  },
-  {
-    id: 'yt-partybus',
-    videoUrl: 'https://www.xvideos.com/video.mdcavk00ad/very_sexy_gangbang_in_club',
-    title: 'Free Luxury VIP Party Bus & Transit Experience',
-    tagline: 'Complimentary hotel pickup, sound systems, LED mood lights & drink stops',
-    category: 'Party Bus Transit',
-    badge: '🚐 FREE TRANSIT',
-    duration: '4:30',
-    views: '960K views',
-    description: 'Step into your private chauffeur transit ride with direct VIP dropoff and waived covers.'
-  },
-  {
-    id: 'yt-club-energy',
-    videoUrl: 'https://www.xvideos.com/video.hblppbo67ca/realitykings_-_in_the_vip_-_fierce_fucking',
-    title: 'Catwalk Runway & Stage Dance Showcase',
-    tagline: 'World-class choreography, center-stage spotlight roasts & dancer welcomes',
-    category: 'Runway Catwalk',
-    badge: '🔥 CATWALK',
-    duration: '3:25',
-    views: '1.5M views',
-    description: 'Front-row VIP leather booths, master sound systems, and 100+ models at your service.'
-  },
-  {
-    id: 'yt-festival-edm',
-    videoUrl: 'https://www.xvideos.com/video.halpitd4e9c/these_party_girls_get_dirtier_than_south_florida_s_wildest_nights',
-    title: 'Laser Spectacular & Main Room Euphoria',
-    tagline: 'Stunning visual production, bass drops & unmatched weekend party energy',
-    category: 'Main Stage',
-    badge: '✨ LASER STAGE',
-    duration: '3:32',
-    views: '710K views',
-    description: 'Epic festival-grade lighting rigs, sparkler bottle trains, and pulse-pounding beats.'
-  },
-  {
-    id: 'yt-latin-heat',
-    videoUrl: 'https://www.xvideos.com/video.ooevdao9269/_ai-generated_elite_strip_club_slave_girls_obedient_naked_dancers_sex_rave_watch_with_sound_music_video',
-    title: 'Tropical Midnight & Latin Beats Lounge',
-    tagline: 'Sensual rhythms, craft cocktail mixes, VIP suites & island party vibes',
-    category: 'VIP Cabaret',
-    badge: '🌴 TROPICAL VIP',
-    duration: '4:41',
-    views: '2.1M views',
-    description: 'Exotic rhythms, luxury lounge decor, and nonstop entertainment until dawn.'
-  }
-];
-
 export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
   city,
   onOpenBooking
 }) => {
-  const [selectedVideo, setSelectedVideo] = useState<YouTubeTeaser>(YOUTUBE_NIGHTLIFE_VIDEOS[0]);
+  // If the current city has a custom video URL defined in city object, use it; otherwise use playlist
+  const initialItem = city.nightlifeVideoUrl
+    ? {
+        id: `city-custom-${city.id}`,
+        videoUrl: city.nightlifeVideoUrl,
+        title: `${city.name} VIP Nightlife Showcase`,
+        tagline: `Exclusive stage show and VIP atmosphere in ${city.name}`,
+        category: 'Featured City Stream',
+        badge: '🌟 FEATURED',
+        duration: 'HD',
+        views: 'VIP Stream',
+        description: `Official featured video stream for ${city.name}.`
+      }
+    : NIGHTLIFE_VIDEOS_CONFIG[0];
+
+  const [selectedVideo, setSelectedVideo] = useState<VideoShowcaseItem>(initialItem);
   const [isTheaterMode, setIsTheaterMode] = useState<boolean>(false);
-  const [customVideoUrlInput, setCustomVideoUrlInput] = useState<string>('');
-  const [showEmbedInput, setShowEmbedInput] = useState<boolean>(false);
+  const [videoError, setVideoError] = useState<boolean>(false);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const videoElementRef = useRef<HTMLVideoElement>(null);
 
-  // Random YouTube video selector
+  // Sync if city changes and city has its own videoUrl
+  useEffect(() => {
+    if (city.nightlifeVideoUrl) {
+      setSelectedVideo({
+        id: `city-custom-${city.id}`,
+        videoUrl: city.nightlifeVideoUrl,
+        title: `${city.name} VIP Nightlife Showcase`,
+        tagline: `Exclusive stage show and VIP atmosphere in ${city.name}`,
+        category: 'Featured City Stream',
+        badge: '🌟 FEATURED',
+        duration: 'HD',
+        views: 'VIP Stream',
+        description: `Official featured video stream for ${city.name}.`
+      });
+    }
+  }, [city.id, city.nightlifeVideoUrl]);
+
+  // Parse ANY video URL dynamically using universalVideo engine
+  const parsedVideo: ParsedVideoResult = parseAnyVideoUrl(selectedVideo.videoUrl);
+
+  // Reset error when switching video
+  useEffect(() => {
+    setVideoError(false);
+  }, [selectedVideo.videoUrl]);
+
+  // Random video shuffler
   const handleRandomVideo = () => {
-    const available = YOUTUBE_NIGHTLIFE_VIDEOS.filter(v => v.videoUrl !== selectedVideo.videoUrl);
+    const available = NIGHTLIFE_VIDEOS_CONFIG.filter(v => v.videoUrl !== selectedVideo.videoUrl);
+    if (available.length === 0) return;
     const randomIndex = Math.floor(Math.random() * available.length);
-    const randomChoice = available[randomIndex] || YOUTUBE_NIGHTLIFE_VIDEOS[0];
-    setSelectedVideo(randomChoice);
+    setSelectedVideo(available[randomIndex] || NIGHTLIFE_VIDEOS_CONFIG[0]);
   };
 
-  // Allow custom YouTube video link embedding
-  const handleCustomYoutubeSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const rawLink = customVideoUrlInput.trim();
-    if (!rawLink) return;
-
-    const customTeaser: YouTubeTeaser = {
-      id: `custom-${Date.now()}`,
-      videoUrl: rawLink,
-      title: `Custom Nightlife Reel`,
-      tagline: `Streaming directly via YouTube Video Link in ${city.name} VIP Cinema`,
-      category: 'Custom Link Stream',
-      badge: '📺 LIVE REEL',
-      duration: 'Live HD',
-      views: 'VIP Stream',
-      description: 'Custom YouTube video link loaded into the VIP Cinema player.'
-    };
-    setSelectedVideo(customTeaser);
-    setCustomVideoUrlInput('');
-    setShowEmbedInput(false);
+  const handleRestartVideo = () => {
+    if (videoElementRef.current) {
+      videoElementRef.current.currentTime = 0;
+      videoElementRef.current.play().catch(() => {});
+    }
   };
-
-  const activeEmbedUrl = getYouTubeEmbedUrl(selectedVideo.videoUrl);
 
   return (
     <section id="nightlife-cinema-section" className="py-16 bg-black text-white relative border-t-2 border-amber-500/20 overflow-hidden text-left">
-      {/* Background Ambient Glows */}
+      {/* Ambient background glows */}
       <div className="absolute top-1/4 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -216,7 +188,7 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
         <div className="text-center max-w-4xl mx-auto mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400 text-xs font-mono font-bold uppercase tracking-wider mb-3 shadow-lg shadow-amber-500/5">
             <Film className="w-4 h-4 text-amber-400 animate-pulse" />
-            <span>NIGHTLIFE CINEMA & YOUTUBE TEASERS • {city.name.toUpperCase()}</span>
+            <span>NIGHTLIFE CINEMA & REELS • {city.name.toUpperCase()}</span>
           </div>
           
           <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase font-serif tracking-tight text-white leading-none">
@@ -224,22 +196,22 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
           </h2>
           
           <p className="text-zinc-300 text-sm sm:text-base mt-3 font-mono max-w-2xl mx-auto leading-relaxed">
-            Watch real YouTube nightlife reels, stage show teasers, party bus vibes, and front-row VIP previews in {city.name}. Over 100+ models at your service.
+            Watch VIP atmosphere reels, stage choreography, and private booth previews in {city.name}. 100+ models at your service tonight.
           </p>
 
-          {/* Quick Action Toolbar */}
+          {/* Quick Toolbar */}
           <div className="flex flex-wrap items-center justify-center gap-3 mt-5">
             <button
               onClick={handleRandomVideo}
-              className="px-4 py-2 bg-gradient-to-r from-amber-500/20 to-rose-500/20 hover:from-amber-500/30 hover:to-rose-500/30 border border-amber-400/40 text-amber-300 rounded-xl font-mono text-xs font-bold uppercase flex items-center gap-2 transition shadow-md active:scale-95"
+              className="px-4 py-2 bg-gradient-to-r from-amber-500/20 to-rose-500/20 hover:from-amber-500/30 hover:to-rose-500/30 border border-amber-400/40 text-amber-300 rounded-xl font-mono text-xs font-bold uppercase flex items-center gap-2 transition shadow-md active:scale-95 cursor-pointer"
             >
-              <Shuffle className="w-3.5 h-3.5 text-amber-400 animate-spin" />
-              <span>🎲 Shuffle Random YouTube Video</span>
+              <Shuffle className="w-3.5 h-3.5 text-amber-400" />
+              <span>🎲 Shuffle Video</span>
             </button>
 
             <button
               onClick={() => setIsTheaterMode(!isTheaterMode)}
-              className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 rounded-xl font-mono text-xs font-bold uppercase flex items-center gap-2 transition"
+              className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 rounded-xl font-mono text-xs font-bold uppercase flex items-center gap-2 transition cursor-pointer"
             >
               {isTheaterMode ? (
                 <>
@@ -249,91 +221,52 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
               ) : (
                 <>
                   <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Expand Big Cinema View</span>
+                  <span>Big Cinema View</span>
                 </>
               )}
             </button>
-
-            <button
-              onClick={() => setShowEmbedInput(!showEmbedInput)}
-              className="px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-white rounded-xl font-mono text-xs flex items-center gap-1.5 transition"
-            >
-              <Tv className="w-3.5 h-3.5 text-amber-400" />
-              <span>Paste YouTube Video Link</span>
-            </button>
           </div>
-
-          {/* Custom YouTube Video Link input form */}
-          {showEmbedInput && (
-            <form onSubmit={handleCustomYoutubeSubmit} className="mt-4 max-w-2xl mx-auto flex flex-col sm:flex-row gap-2 p-2 bg-zinc-900/95 border border-amber-500/40 rounded-2xl shadow-xl">
-              <div className="flex-1 flex items-center gap-2 bg-black/60 border border-zinc-700 px-3.5 py-2 rounded-xl">
-                <LinkIcon className="w-4 h-4 text-amber-400 shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Paste YouTube Video Link (e.g. https://www.youtube.com/watch?v=4NRXx6U8ABQ)..."
-                  value={customVideoUrlInput}
-                  onChange={(e) => setCustomVideoUrlInput(e.target.value)}
-                  className="w-full bg-transparent text-xs font-mono text-white placeholder-zinc-500 focus:outline-none"
-                />
-              </div>
-              <button
-                type="submit"
-                className="px-5 py-2.5 bg-gradient-to-r from-amber-400 to-rose-500 hover:from-amber-300 hover:to-rose-400 text-black text-xs font-mono font-black uppercase rounded-xl transition shrink-0"
-              >
-                Stream Video Link
-              </button>
-            </form>
-          )}
         </div>
 
-        {/* Video Player Grid (Extra Large Cinema View) */}
+        {/* Video Player Grid */}
         <div className={`grid grid-cols-1 gap-6 items-start ${isTheaterMode ? 'lg:grid-cols-12' : 'lg:grid-cols-12'}`}>
           
-          {/* Main Big YouTube Cinema Player */}
+          {/* Main Cinema Player Container */}
           <div className={`${isTheaterMode ? 'lg:col-span-9' : 'lg:col-span-8'} bg-zinc-950 border-2 border-amber-500/50 rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.15)] relative group`}>
             
-            {/* Top Bar with Clear Responsive Layout (No Button Collision) */}
+            {/* Top Bar with Format Badge & Details */}
             <div className="p-3.5 sm:p-4 bg-gradient-to-r from-zinc-900 via-zinc-950 to-zinc-900 border-b border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="px-2.5 py-1 bg-amber-500/20 border border-amber-400/40 rounded-lg text-[11px] font-mono text-amber-300 font-bold shrink-0 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-                  <span>{selectedVideo.badge}</span>
+                  <span>{parsedVideo.platformName.toUpperCase()}</span>
                 </span>
                 <div className="min-w-0">
                   <h3 className="text-xs sm:text-sm font-bold text-white font-serif uppercase truncate">
                     {selectedVideo.title}
                   </h3>
                   <p className="text-[10px] text-zinc-400 font-mono truncate">
-                    {selectedVideo.category} • {selectedVideo.views} • {selectedVideo.duration}
+                    {selectedVideo.category} {selectedVideo.views ? `• ${selectedVideo.views}` : ''} {selectedVideo.duration ? `• ${selectedVideo.duration}` : ''}
                   </p>
                 </div>
               </div>
 
-              {/* Action Buttons in Top Bar */}
+              {/* Action Buttons */}
               <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
                 <a
                   href={selectedVideo.videoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white text-[11px] font-mono rounded-lg border border-zinc-700 flex items-center gap-1 transition"
-                  title="Open YouTube Link in new tab"
+                  title="Open video URL in new tab"
                 >
                   <ExternalLink className="w-3 h-3" />
-                  <span className="hidden md:inline">Open Link</span>
+                  <span className="hidden md:inline">Source Link</span>
                 </a>
 
                 <button
-                  onClick={handleRandomVideo}
-                  className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-amber-300 text-[11px] font-mono font-bold rounded-lg border border-zinc-700 flex items-center gap-1 transition"
-                  title="Play another random video"
-                >
-                  <Shuffle className="w-3 h-3" />
-                  <span className="hidden sm:inline">Shuffle</span>
-                </button>
-
-                <button
                   onClick={onOpenBooking}
-                  className="px-4 py-1.5 bg-gradient-to-r from-amber-400 to-rose-500 hover:from-amber-300 hover:to-rose-400 text-black text-xs font-mono font-black uppercase rounded-lg transition shadow-md flex items-center gap-1.5"
+                  className="px-4 py-1.5 bg-gradient-to-r from-amber-400 to-rose-500 hover:from-amber-300 hover:to-rose-400 text-black text-xs font-mono font-black uppercase rounded-lg transition shadow-md flex items-center gap-1.5 cursor-pointer"
                 >
                   <Crown className="w-3.5 h-3.5" />
                   <span>Get VIP Pass</span>
@@ -341,16 +274,58 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
               </div>
             </div>
 
-            {/* Embedded YouTube 16:9 Big Player using YouTube video link */}
-            <div className="relative w-full aspect-video min-h-[280px] sm:min-h-[400px] md:min-h-[480px] lg:min-h-[520px] bg-black">
-              <iframe
-                key={selectedVideo.videoUrl}
-                src={activeEmbedUrl}
-                title={selectedVideo.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="w-full h-full absolute inset-0 border-0"
-              />
+            {/* Universal Video Playback Area: HTML5 Video vs Universal Embed Iframe */}
+            <div className="relative w-full aspect-video min-h-[280px] sm:min-h-[400px] md:min-h-[480px] lg:min-h-[520px] bg-black flex items-center justify-center overflow-hidden">
+              
+              {parsedVideo.isDirectFile ? (
+                /* Native HTML5 Video Player for MP4 / WebM / Direct Media Files */
+                <video
+                  ref={videoElementRef}
+                  key={parsedVideo.directFileUrl}
+                  src={parsedVideo.directFileUrl}
+                  controls
+                  autoPlay
+                  playsInline
+                  loop
+                  muted={isMuted}
+                  poster={selectedVideo.posterImage || parsedVideo.thumbnailUrl}
+                  onError={() => setVideoError(true)}
+                  className="w-full h-full object-contain bg-black"
+                >
+                  <source src={parsedVideo.directFileUrl} />
+                  Your browser does not support HTML5 video streaming.
+                </video>
+              ) : (
+                /* Universal Web Embed Player (YouTube, Vimeo, Streamable, Loom, Dailymotion, Wistia) */
+                <iframe
+                  key={parsedVideo.embedUrl}
+                  src={parsedVideo.embedUrl}
+                  title={selectedVideo.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full absolute inset-0 border-0"
+                  onError={() => setVideoError(true)}
+                />
+              )}
+
+              {/* Graceful Fallback if URL fails */}
+              {videoError && (
+                <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-6 text-center space-y-3 z-20">
+                  <Film className="w-10 h-10 text-rose-400" />
+                  <h4 className="text-sm font-mono font-bold uppercase text-white">Video Stream Notice</h4>
+                  <p className="text-xs text-zinc-400 font-mono max-w-md">
+                    This video URL could not be played directly inside an iframe. You can view it directly via the source link.
+                  </p>
+                  <a
+                    href={selectedVideo.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-amber-400 text-black text-xs font-mono font-bold rounded-xl uppercase"
+                  >
+                    Open Source Video Link
+                  </a>
+                </div>
+              )}
             </div>
 
             {/* Video Description & VIP Guarantee Bar */}
@@ -359,13 +334,11 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
                 <p className="text-xs sm:text-sm font-mono text-zinc-300 font-medium">
                   {selectedVideo.tagline}
                 </p>
-                <p className="text-[11px] text-zinc-400 font-mono">
-                  {selectedVideo.description}
-                </p>
-                <div className="pt-1 flex items-center gap-1.5 text-[10px] text-zinc-500 font-mono truncate">
-                  <LinkIcon className="w-3 h-3 text-zinc-400 shrink-0" />
-                  <span className="truncate">{selectedVideo.videoUrl}</span>
-                </div>
+                {selectedVideo.description && (
+                  <p className="text-[11px] text-zinc-400 font-mono">
+                    {selectedVideo.description}
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 shrink-0 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-xl">
@@ -375,17 +348,17 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
             </div>
           </div>
 
-          {/* Playlist & Teaser Selector Sidebar */}
+          {/* Playlist Sidebar */}
           <div className={`${isTheaterMode ? 'lg:col-span-3' : 'lg:col-span-4'} space-y-3 font-mono`}>
             
             {/* Playlist Header */}
             <div className="p-3.5 bg-zinc-950/90 border border-zinc-800 rounded-2xl flex items-center justify-between">
               <div>
                 <span className="text-xs text-amber-400 font-bold uppercase block tracking-wider">
-                  🎬 Nightlife Teasers ({YOUTUBE_NIGHTLIFE_VIDEOS.length})
+                  🎬 Video Playlist ({NIGHTLIFE_VIDEOS_CONFIG.length})
                 </span>
                 <p className="text-zinc-400 text-[11px] mt-0.5">
-                  Select a video to stream via YouTube video link
+                  Select any video to play
                 </p>
               </div>
               <span className="text-[10px] bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold px-2 py-1 rounded-lg flex items-center gap-1">
@@ -393,17 +366,17 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
               </span>
             </div>
 
-            {/* YouTube Teaser Cards */}
+            {/* Video Playlist Cards */}
             <div className="space-y-2.5 max-h-[580px] overflow-y-auto pr-1">
-              {YOUTUBE_NIGHTLIFE_VIDEOS.map((teaser) => {
-                const isCurrent = selectedVideo.videoUrl === teaser.videoUrl;
-                const thumbnailUrl = getYouTubeThumbnailUrl(teaser.videoUrl);
+              {NIGHTLIFE_VIDEOS_CONFIG.map((item) => {
+                const isCurrent = selectedVideo.videoUrl === item.videoUrl;
+                const parsed = parseAnyVideoUrl(item.videoUrl);
 
                 return (
                   <button
-                    key={teaser.id}
-                    onClick={() => setSelectedVideo(teaser)}
-                    className={`w-full p-3 rounded-2xl border transition text-left flex items-center gap-3 group relative ${
+                    key={item.id}
+                    onClick={() => setSelectedVideo(item)}
+                    className={`w-full p-3 rounded-2xl border transition text-left flex items-center gap-3 group relative cursor-pointer ${
                       isCurrent
                         ? 'bg-amber-500/15 border-amber-400 shadow-lg shadow-amber-500/10 ring-1 ring-amber-400'
                         : 'bg-zinc-900/90 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900'
@@ -412,11 +385,10 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
                     {/* Thumbnail with Play indicator */}
                     <div className="relative w-24 h-16 rounded-xl overflow-hidden shrink-0 border border-zinc-700 bg-black shadow-md">
                       <img
-                        src={thumbnailUrl}
-                        alt={teaser.title}
+                        src={item.posterImage || parsed.thumbnailUrl}
+                        alt={item.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                         onError={(e) => {
-                          // Fallback thumbnail if HQ fails
                           (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800&auto=format&fit=crop';
                         }}
                       />
@@ -425,24 +397,28 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
                           <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
                         </div>
                       </div>
-                      <div className="absolute bottom-1 right-1 bg-black/80 text-white text-[9px] px-1 py-0.2 rounded font-mono font-bold">
-                        {teaser.duration}
-                      </div>
+                      {item.duration && (
+                        <div className="absolute bottom-1 right-1 bg-black/80 text-white text-[9px] px-1 py-0.2 rounded font-mono font-bold">
+                          {item.duration}
+                        </div>
+                      )}
                     </div>
 
                     {/* Video Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] text-amber-300 font-bold uppercase truncate">
-                          {teaser.category}
+                          {item.badge || item.category}
                         </span>
-                        <span className="text-[10px] text-zinc-400">{teaser.views}</span>
+                        {item.views && (
+                          <span className="text-[10px] text-zinc-400">{item.views}</span>
+                        )}
                       </div>
                       <h5 className="text-xs font-bold text-white truncate mt-0.5 font-serif uppercase group-hover:text-amber-300 transition">
-                        {teaser.title}
+                        {item.title}
                       </h5>
                       <p className="text-[10px] text-zinc-400 line-clamp-1 mt-0.5">
-                        {teaser.tagline}
+                        {item.tagline}
                       </p>
                     </div>
 
@@ -457,7 +433,7 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
               })}
             </div>
 
-            {/* Quick VIP Pass Callout Card */}
+            {/* VIP Pass Callout Card */}
             <div className="p-4 bg-gradient-to-br from-amber-500/15 via-zinc-900 to-rose-500/15 border border-amber-500/40 rounded-2xl space-y-2.5 shadow-xl">
               <div className="flex items-center justify-between text-amber-300 font-bold text-xs uppercase">
                 <div className="flex items-center gap-2">
@@ -473,7 +449,7 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
               
               <button
                 onClick={onOpenBooking}
-                className="w-full py-3 bg-gradient-to-r from-amber-400 via-amber-500 to-rose-500 hover:from-amber-300 hover:to-rose-400 text-black text-xs font-black uppercase rounded-xl transition font-mono shadow-lg flex items-center justify-center gap-2"
+                className="w-full py-3 bg-gradient-to-r from-amber-400 via-amber-500 to-rose-500 hover:from-amber-300 hover:to-rose-400 text-black text-xs font-black uppercase rounded-xl transition font-mono shadow-lg flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Crown className="w-4 h-4" />
                 <span>Book Instant VIP Package</span>

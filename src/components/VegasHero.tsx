@@ -6,6 +6,10 @@ import { LiveEventCountdownTimer } from './LiveEventCountdownTimer';
 import { DestinationCity, SupportedCurrency } from '../types';
 import { convertCurrency } from '../data/globalDestinationsData';
 import { ALL_50_US_STATES, buildDestinationCityFromUSStateAndCity } from '../data/usStatesData';
+import { parseAnyVideoUrl } from '../utils/universalVideo';
+
+// You can change this to ANY video link (YouTube, Vimeo, MP4 file, Streamable, etc.) and it will automatically work!
+export const DEFAULT_HERO_VIDEO_URL = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
 
 interface VegasHeroProps {
   city: DestinationCity;
@@ -105,6 +109,10 @@ export const VegasHero: React.FC<VegasHeroProps> = ({
   const [videoBgActive, setVideoBgActive] = useState(true);
   const starterPrice = convertCurrency(50, currency).formatted;
 
+  // Resolves ANY video URL placed in code (YouTube, Vimeo, MP4 file, etc.)
+  const activeHeroVideoUrl = city.heroVideoUrl || DEFAULT_HERO_VIDEO_URL;
+  const parsedHeroVideo = parseAnyVideoUrl(activeHeroVideoUrl);
+
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center pt-8 pb-20 px-4 sm:px-6 overflow-hidden bg-zinc-950 text-white">
       {/* VIP Runway Stage & Numbered Cards Hero Background Backdrop (User Image) */}
@@ -117,27 +125,38 @@ export const VegasHero: React.FC<VegasHeroProps> = ({
         <RunwayStageBackdrop className="w-full h-full object-cover" overlayOpacity="opacity-50" />
       </motion.div>
 
-      {/* Looping nightlife video overlay */}
+      {/* Looping nightlife video overlay (Supports ANY video URL format in code) */}
       {videoBgActive && (
         <motion.div 
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.2 }}
+          animate={{ opacity: 0.22 }}
           transition={{ duration: 1.5, delay: 0.2 }}
           className="absolute inset-0 z-0 overflow-hidden pointer-events-none mix-blend-screen"
         >
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            crossOrigin="anonymous"
-            preload="metadata"
-            className="w-full h-full object-cover scale-105 filter blur-[1px]"
-            onError={() => setVideoBgActive(false)}
-          >
-            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4" />
-            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
-          </video>
+          {parsedHeroVideo.isDirectFile ? (
+            <video
+              key={parsedHeroVideo.directFileUrl}
+              autoPlay
+              loop
+              muted
+              playsInline
+              crossOrigin="anonymous"
+              preload="auto"
+              className="w-full h-full object-cover scale-105 filter blur-[1px]"
+              onError={() => setVideoBgActive(false)}
+            >
+              <source src={parsedHeroVideo.directFileUrl} />
+            </video>
+          ) : (
+            <iframe
+              key={parsedHeroVideo.bgEmbedUrl}
+              src={parsedHeroVideo.bgEmbedUrl}
+              title="Hero Background Video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              className="w-[150%] h-[150%] absolute -top-[25%] -left-[25%] object-cover pointer-events-none border-0"
+              onError={() => setVideoBgActive(false)}
+            />
+          )}
         </motion.div>
       )}
 
@@ -255,28 +274,31 @@ export const VegasHero: React.FC<VegasHeroProps> = ({
             </motion.div>
           </div>
 
-          {/* Quick CTA to YouTube Cinema */}
+          {/* Quick CTA to VIP Passes */}
           <motion.div 
             variants={itemFadeUp}
             className="pt-2 flex flex-wrap items-center justify-center gap-3 font-mono text-xs"
           >
-            <motion.a
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.96 }}
-              href="#nightlife-cinema-section"
-              className="px-5 py-2.5 bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 hover:from-red-500 hover:to-amber-400 text-white font-black uppercase rounded-xl transition shadow-lg shadow-red-600/30 flex items-center gap-2 border border-red-400/40"
-            >
-              <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping" />
-              <span>▶ Watch 4K YouTube Nightlife Teasers</span>
-            </motion.a>
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.96 }}
               onClick={onOpenBooking}
-              className="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-amber-300 border border-amber-500/40 font-bold uppercase rounded-xl transition flex items-center gap-2"
+              className="px-6 py-3 bg-gradient-to-r from-amber-400 via-amber-500 to-rose-500 hover:from-amber-300 hover:to-rose-400 text-black font-black uppercase rounded-xl transition shadow-lg shadow-amber-500/20 flex items-center gap-2"
             >
-              <Crown className="w-4 h-4 text-amber-400" />
-              <span>Get $50 VIP Pass</span>
+              <Crown className="w-4 h-4 text-black" />
+              <span>Get {starterPrice} VIP Pass</span>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
+              onClick={() => {
+                const el = document.getElementById('vip-packages-section');
+                el?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="px-5 py-3 bg-zinc-900/90 hover:bg-zinc-800 text-amber-300 border border-amber-500/40 font-bold uppercase rounded-xl transition flex items-center gap-2"
+            >
+              <Flame className="w-4 h-4 text-rose-400" />
+              <span>Explore VIP Packages</span>
             </motion.button>
           </motion.div>
         </motion.div>
