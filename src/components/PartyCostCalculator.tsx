@@ -25,10 +25,6 @@ export const PartyCostCalculator: React.FC<PartyCostCalculatorProps> = ({
 
   const { basePackageCost, totalStageCash, extraAddOnsTotal, totalPartyCost, costPerPerson, payingGuestsCount } = useMemo(() => {
     let base = selectedPackage.price;
-    if (selectedPackage.id === 'fastpass_express') {
-      base = selectedPackage.price * partySize;
-    }
-
     const cash = dancerCashPerGuy * partySize;
     let extras = 0;
     if (addHookah && !selectedPackage.hookahIncluded) extras += 45;

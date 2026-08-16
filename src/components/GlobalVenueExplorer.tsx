@@ -23,13 +23,13 @@ export const GlobalVenueExplorer: React.FC<GlobalVenueExplorerProps> = ({
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400 text-xs font-mono font-bold uppercase tracking-wider mb-3">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>OFFICIAL VIP VENUE PARTNERS • {city.name.toUpperCase()}, {city.countryCode}</span>
+              <span>18+ TOTALLY NUDE VIP VENUE PARTNERS • {city.name.toUpperCase()}, {city.countryCode}</span>
             </div>
             <h2 className="text-3xl sm:text-5xl font-black uppercase font-serif tracking-tight">
-              FEATURED CABARETS & <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-rose-500">VIP LOUNGES</span>
+              18+ TOTALLY NUDE CABARETS & <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-rose-500">VIP LOUNGES</span>
             </h2>
-            <p className="text-zinc-400 text-sm sm:text-base mt-2 font-mono max-w-2xl">
-              Handpicked, verified premier adult entertainment clubs, 18+ cabarets, and ultra lounges in {city.name} with free hotel pickup transit and waived admission.
+            <p className="text-zinc-400 text-xs sm:text-base mt-2 font-mono max-w-2xl">
+              Handpicked, verified premier 18+ Totally Nude adult entertainment clubs, totally nude main stages, and private VIP champagne lounges in {city.name} with free hotel pickup transit and waived admission.
             </p>
           </div>
 

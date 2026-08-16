@@ -74,9 +74,12 @@ export const GlobalDestinationSelector: React.FC<GlobalDestinationSelectorProps>
         <div className="p-4 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Compass className="w-5 h-5 text-amber-400" />
-            <h2 className="text-base font-bold text-white uppercase tracking-tight">
-              Select Your State & City
-            </h2>
+            <div>
+              <h2 className="text-base font-bold text-white uppercase tracking-tight">
+                18+ TOTALLY NUDE PARTY • Select State & City
+              </h2>
+              <span className="text-[10px] text-zinc-400 font-mono block">All 50 US States & Top Worldwide Cabarets</span>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">

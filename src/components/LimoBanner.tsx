@@ -42,13 +42,13 @@ export const LimoBanner: React.FC<LimoBannerProps> = ({ city, onReservePickup, o
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400 text-xs font-mono font-bold uppercase tracking-wider mb-3">
             <Car className="w-3.5 h-3.5" />
-            <span>NUDE PARTY NEAR ME • 100% FREE PICKUP & TRANSIT • {city.name.toUpperCase()}</span>
+            <span>18+ TOTALLY NUDE CABARET • 100% FREE PICKUP & TRANSIT • {city.name.toUpperCase()}</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight font-serif">
-            NUDE PARTY NEAR ME <span className="text-amber-400">• FREE PICKUP</span>
+            18+ TOTALLY NUDE PARTY <span className="text-amber-400">• FREE VIP PICKUP</span>
           </h2>
-          <p className="text-zinc-400 text-sm sm:text-base mt-3 leading-relaxed font-mono">
-            Looking for a premier nude party near you? In {city.name}, Little Darlings Nude Party dispatches complimentary luxury transit, Escalades, or executive Sprinters directly to your hotel valet with retail beverage stops authorized.
+          <p className="text-zinc-400 text-xs sm:text-base mt-3 leading-relaxed font-mono">
+            Looking for the premier 18+ Totally Nude Cabaret & Party near you? In {city.name}, Little Darlings Nude Party dispatches complimentary luxury transit, Escalades, or executive Sprinters directly to your hotel valet with retail beverage stops authorized. Over 100+ models totally nude at your service upon arrival.
           </p>
         </div>
 

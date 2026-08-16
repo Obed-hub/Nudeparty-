@@ -132,7 +132,7 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ onRSVPSuccess, initialData, 
     const errors: string[] = [];
 
     if (step === 1) {
-      if (!fullName.trim()) errors.push('Full nickname is required.');
+      if (!fullName.trim()) errors.push('Full legal name is required.');
       if (!email.trim() || !email.includes('@')) errors.push('A valid email is required for pass delivery.');
       if (!phone.trim()) errors.push('Phone number is required for SMS check-in alert.');
       if (!birthDate) {

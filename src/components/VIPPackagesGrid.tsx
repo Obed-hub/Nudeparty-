@@ -22,7 +22,7 @@ export const VIPPackagesGrid: React.FC<VIPPackagesGridProps> = ({
   const filteredPackages = GLOBAL_VIP_PACKAGES.filter(pkg => {
     if (filterType === 'WEEKEND') return pkg.id === 'weekend_all_access';
     if (filterType === 'BACHELOR') return pkg.id === 'gold_bachelor' || pkg.id === 'baller_penthouse' || pkg.id === 'platinum_highroller';
-    if (filterType === 'SMALL_GROUPS') return pkg.id === 'silver_starter' || pkg.id === 'weekend_all_access' || pkg.id === 'couples_fantasy' || pkg.id === 'fastpass_express';
+    if (filterType === 'SMALL_GROUPS') return pkg.id === 'silver_starter' || pkg.id === 'weekend_all_access' || pkg.id === 'couples_fantasy';
     if (filterType === 'HIGH_ROLLER') return pkg.id === 'platinum_highroller' || pkg.id === 'baller_penthouse';
     return true;
   });
@@ -38,21 +38,21 @@ export const VIPPackagesGrid: React.FC<VIPPackagesGridProps> = ({
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-amber-500/20 to-rose-500/20 border border-amber-500/40 rounded-full text-amber-400 text-xs font-mono font-bold uppercase tracking-wider mb-3">
             <Crown className="w-3.5 h-3.5" />
-            <span>GLOBAL VIP EXPERIENCES • {city.name.toUpperCase()}, {city.countryCode}</span>
+            <span>18+ TOTALLY NUDE VIP EXPERIENCES • {city.name.toUpperCase()}, {city.countryCode}</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight font-serif">
-            CHOOSE YOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-rose-500">VIP PACKAGE</span>
+            18+ TOTALLY NUDE <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-rose-500">VIP SERVICE PACKAGES</span>
           </h2>
           
           {/* Over 100+ Models Guarantee Strip */}
-          <div className="my-4 p-3 bg-gradient-to-r from-rose-500/20 via-amber-500/20 to-purple-500/20 border border-rose-500/40 rounded-2xl flex items-center justify-center gap-2 text-rose-300 font-mono text-xs font-bold uppercase tracking-wide">
+          <div className="my-4 p-3 bg-gradient-to-r from-rose-500/20 via-amber-500/20 to-purple-500/20 border border-rose-500/40 rounded-2xl flex flex-wrap items-center justify-center gap-2 text-rose-300 font-mono text-xs font-bold uppercase tracking-wide text-center">
             <Sparkles className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
-            <span>ALL VIP PACKAGES INCLUDE OVER 100+ MODELS/GIRLS AT YOUR SERVICE</span>
+            <span>ALL PACKAGES INCLUDE OVER 100+ MODELS TOTALLY NUDE AT YOUR SERVICE</span>
             <Sparkles className="w-4 h-4 text-rose-400 shrink-0 animate-pulse" />
           </div>
 
-          <p className="text-zinc-400 text-sm sm:text-base mt-2 leading-relaxed font-mono">
-            All VIP packages in {city.name} include complimentary luxury vehicle/party bus pickup from any hotel, front-of-line VIP admission with waived cover charge, and reserved booth seating.
+          <p className="text-zinc-400 text-xs sm:text-base mt-2 leading-relaxed font-mono">
+            All 18+ Totally Nude VIP packages in {city.name} include complimentary luxury vehicle/party bus pickup from any hotel, front-of-line VIP admission with waived cover charge, totally nude main stage viewing, and reserved booth table service.
           </p>
 
           {/* Filter & Comparison Switchers */}

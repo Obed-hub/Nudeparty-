@@ -42,8 +42,8 @@ const LADY_BOOKINGS_POOL: Omit<LadyBookingNotification, 'id' | 'pickupSpotTempla
     partyType: 'VIP Runway Experience',
     avatarColor: 'from-rose-500 to-amber-500',
     avatarInitials: 'SL',
-    packageTitle: 'Front-Row Catwalk VIP Pass',
-    packageId: 'fastpass_express',
+    packageTitle: 'Friday VIP Pass & Table Service',
+    packageId: 'silver_starter',
     timeAgo: 'Just now',
     verified: true,
     groupCount: '4 Ladies'
@@ -116,11 +116,11 @@ const LADY_BOOKINGS_POOL: Omit<LadyBookingNotification, 'id' | 'pickupSpotTempla
   },
   {
     ladyName: 'Natalia Rossi',
-    partyType: 'Private VIP FastPass',
+    partyType: 'VIP Friday Table Service',
     avatarColor: 'from-pink-600 to-purple-600',
     avatarInitials: 'NR',
-    packageTitle: 'Express VIP Pass & Velvet Rope Access',
-    packageId: 'fastpass_express',
+    packageTitle: 'Friday VIP Pass & Table Service',
+    packageId: 'silver_starter',
     timeAgo: '12 mins ago',
     verified: true,
     groupCount: '2 Guests'

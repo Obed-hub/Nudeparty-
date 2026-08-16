@@ -6,10 +6,6 @@ import { LiveEventCountdownTimer } from './LiveEventCountdownTimer';
 import { DestinationCity, SupportedCurrency } from '../types';
 import { convertCurrency } from '../data/globalDestinationsData';
 import { ALL_50_US_STATES, buildDestinationCityFromUSStateAndCity } from '../data/usStatesData';
-import { parseAnyVideoUrl } from '../utils/universalVideo';
-
-// You can change this to ANY video link (YouTube, Vimeo, MP4 file, Streamable, etc.) and it will automatically work!
-export const DEFAULT_HERO_VIDEO_URL = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
 
 interface VegasHeroProps {
   city: DestinationCity;
@@ -106,12 +102,7 @@ export const VegasHero: React.FC<VegasHeroProps> = ({
     onQuickPickupRequest(finalPickup);
   };
 
-  const [videoBgActive, setVideoBgActive] = useState(true);
   const starterPrice = convertCurrency(50, currency).formatted;
-
-  // Resolves ANY video URL placed in code (YouTube, Vimeo, MP4 file, etc.)
-  const activeHeroVideoUrl = city.heroVideoUrl || DEFAULT_HERO_VIDEO_URL;
-  const parsedHeroVideo = parseAnyVideoUrl(activeHeroVideoUrl);
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center pt-8 pb-20 px-4 sm:px-6 overflow-hidden bg-zinc-950 text-white">
@@ -124,41 +115,6 @@ export const VegasHero: React.FC<VegasHeroProps> = ({
       >
         <RunwayStageBackdrop className="w-full h-full object-cover" overlayOpacity="opacity-50" />
       </motion.div>
-
-      {/* Looping nightlife video overlay (Supports ANY video URL format in code) */}
-      {videoBgActive && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.22 }}
-          transition={{ duration: 1.5, delay: 0.2 }}
-          className="absolute inset-0 z-0 overflow-hidden pointer-events-none mix-blend-screen"
-        >
-          {parsedHeroVideo.isDirectFile ? (
-            <video
-              key={parsedHeroVideo.directFileUrl}
-              autoPlay
-              loop
-              muted
-              playsInline
-              crossOrigin="anonymous"
-              preload="auto"
-              className="w-full h-full object-cover scale-105 filter blur-[1px]"
-              onError={() => setVideoBgActive(false)}
-            >
-              <source src={parsedHeroVideo.directFileUrl} />
-            </video>
-          ) : (
-            <iframe
-              key={parsedHeroVideo.bgEmbedUrl}
-              src={parsedHeroVideo.bgEmbedUrl}
-              title="Hero Background Video"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              className="w-[150%] h-[150%] absolute -top-[25%] -left-[25%] object-cover pointer-events-none border-0"
-              onError={() => setVideoBgActive(false)}
-            />
-          )}
-        </motion.div>
-      )}
 
       {/* Background visual neon glowing backdrop */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/70 via-zinc-950/85 to-zinc-950 pointer-events-none z-0" />
@@ -213,64 +169,64 @@ export const VegasHero: React.FC<VegasHeroProps> = ({
         {/* Big Impact Headline */}
         <motion.div variants={itemFadeUp} className="relative mb-6">
           <motion.span 
-            initial={{ opacity: 0, letterSpacing: '0.2em' }}
-            animate={{ opacity: 1, letterSpacing: '0.35em' }}
+            initial={{ opacity: 0, letterSpacing: '0.15em' }}
+            animate={{ opacity: 1, letterSpacing: '0.25em' }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="block text-xs sm:text-sm font-mono font-bold uppercase text-amber-400 mb-3"
+            className="block text-[11px] sm:text-sm font-mono font-bold uppercase text-amber-400 mb-2 sm:mb-3"
           >
-            LITTLE DARLINGS NUDE PARTY • {city.name.toUpperCase()}, {city.stateOrRegion ? city.stateOrRegion.toUpperCase() : 'USA'}
+            🔥 18+ TOTALLY NUDE VIP CABARET & NUDE PARTY • {city.name.toUpperCase()}, {city.stateOrRegion ? city.stateOrRegion.toUpperCase() : 'USA'}
           </motion.span>
-          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight uppercase leading-[0.92] font-serif">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight uppercase leading-[0.95] font-serif break-words">
             LITTLE DARLINGS <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-rose-500">NUDE PARTY</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-rose-500">18+ TOTALLY NUDE PARTY</span>
           </h1>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-zinc-200 uppercase tracking-tight mt-2 font-sans">
-            VIP PACKAGES & FREE PARTY BUS
+          <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-zinc-200 uppercase tracking-tight mt-2 font-sans">
+            TOTALLY NUDE STAGE SHOWS & VIP CHAUFFEUR
           </h2>
         </motion.div>
 
         {/* Dynamic Subheading & Key Highlights */}
         <motion.div variants={itemFadeUp} className="max-w-3xl mx-auto space-y-3">
-          <p className="text-sm sm:text-base text-zinc-300 font-mono leading-relaxed">
-            {city.description} Book instant VIP passes, stage-front leather booths, and 100% complimentary luxury vehicle pickup in {city.name}, {city.stateOrRegion}. Skip the lines, waive the door cover, and experience nightlife with total VIP discretion.
+          <p className="text-xs sm:text-base text-zinc-300 font-mono leading-relaxed px-2 sm:px-0">
+            {city.description} Experience the world-famous 18+ Totally Nude Cabaret with over 100+ stunning models totally nude at your service across 3 main stages and private VIP suites in {city.name}, {city.stateOrRegion}. Book instant VIP table service, front-row runway seating, and 100% complimentary luxury vehicle pickup.
           </p>
           {/* Rearranged Exclusive VIP Experience Badges with Framer Motion hover & staggered pop-in */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 max-w-4xl mx-auto font-mono text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 pt-2 max-w-4xl mx-auto font-mono text-xs">
             <motion.div 
               variants={badgeItemVariants}
               whileHover={{ scale: 1.04, y: -2 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-              className="p-2.5 bg-zinc-900/90 border border-rose-500/40 rounded-xl flex items-center gap-2 text-rose-300 shadow-md cursor-default"
+              className="p-2 sm:p-2.5 bg-zinc-900/90 border border-rose-500/40 rounded-xl flex items-center gap-1.5 sm:gap-2 text-rose-300 shadow-md cursor-default"
             >
               <Flame className="w-4 h-4 text-rose-400 shrink-0" />
-              <span className="font-bold text-[11px] uppercase tracking-wide">Unend intimate night</span>
+              <span className="font-bold text-[10px] sm:text-[11px] uppercase tracking-wide">100% Totally Nude</span>
             </motion.div>
             <motion.div 
               variants={badgeItemVariants}
               whileHover={{ scale: 1.04, y: -2 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-              className="p-2.5 bg-zinc-900/90 border border-amber-500/40 rounded-xl flex items-center gap-2 text-amber-300 shadow-md cursor-default"
+              className="p-2 sm:p-2.5 bg-zinc-900/90 border border-amber-500/40 rounded-xl flex items-center gap-1.5 sm:gap-2 text-amber-300 shadow-md cursor-default"
             >
               <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
-              <span className="font-bold text-[11px] uppercase tracking-wide">We don't kiss and tell</span>
+              <span className="font-bold text-[10px] sm:text-[11px] uppercase tracking-wide">We don't kiss and tell</span>
             </motion.div>
             <motion.div 
               variants={badgeItemVariants}
               whileHover={{ scale: 1.04, y: -2 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-              className="p-2.5 bg-zinc-900/90 border border-emerald-500/40 rounded-xl flex items-center gap-2 text-emerald-300 shadow-md cursor-default"
+              className="p-2 sm:p-2.5 bg-zinc-900/90 border border-emerald-500/40 rounded-xl flex items-center gap-1.5 sm:gap-2 text-emerald-300 shadow-md cursor-default"
             >
               <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="font-bold text-[11px] uppercase tracking-wide">Med test kit upon entry</span>
+              <span className="font-bold text-[10px] sm:text-[11px] uppercase tracking-wide">Med test kit at entry</span>
             </motion.div>
             <motion.div 
               variants={badgeItemVariants}
               whileHover={{ scale: 1.04, y: -2 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-              className="p-2.5 bg-zinc-900/90 border border-purple-500/40 rounded-xl flex items-center gap-2 text-purple-300 shadow-md cursor-default"
+              className="p-2 sm:p-2.5 bg-zinc-900/90 border border-purple-500/40 rounded-xl flex items-center gap-1.5 sm:gap-2 text-purple-300 shadow-md cursor-default"
             >
               <Users className="w-4 h-4 text-purple-400 shrink-0" />
-              <span className="font-bold text-[11px] uppercase tracking-wide">Group intimate</span>
+              <span className="font-bold text-[10px] sm:text-[11px] uppercase tracking-wide">100+ Models Nude</span>
             </motion.div>
           </div>
 

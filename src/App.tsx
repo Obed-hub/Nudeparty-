@@ -4,7 +4,6 @@ import { VegasHero } from './components/VegasHero';
 import { GlobalDestinationSelector } from './components/GlobalDestinationSelector';
 import { GlobalVenueExplorer } from './components/GlobalVenueExplorer';
 import { LimoBanner } from './components/LimoBanner';
-import { NightlifeVideoShowcase } from './components/NightlifeVideoShowcase';
 import { VIPPackagesGrid } from './components/VIPPackagesGrid';
 import { BookingWizard } from './components/BookingWizard';
 import { DigitalVIPPassModal } from './components/DigitalVIPPassModal';
@@ -70,9 +69,9 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white selection:bg-amber-400 selection:text-black font-sans antialiased relative">
+    <div className="min-h-screen bg-zinc-950 text-white selection:bg-amber-400 selection:text-black font-sans antialiased relative w-full max-w-full overflow-x-hidden">
       {/* Global VIP Runway Stage with Numbered Cards Background (User Image) */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden max-w-full">
         <RunwayStageBackdrop className="w-full h-full object-cover" overlayOpacity="opacity-45" />
         {/* Luxury multi-layer dark gradient & neon ambient glows */}
         <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/80 via-zinc-950/85 to-zinc-950 pointer-events-none" />
@@ -167,12 +166,6 @@ export function App() {
         currency={selectedCurrency}
         onSelectPackage={(pkgId) => handleOpenBooking(pkgId)}
         onOpenHostChat={() => setIsHostChatOpen(true)}
-      />
-
-      {/* Nightlife Video Atmosphere Showcase */}
-      <NightlifeVideoShowcase
-        city={selectedCity}
-        onOpenBooking={handleOpenBooking}
       />
 
       {/* Curated High-Quality Event Photos Gallery & Carousel */}
