@@ -12,7 +12,10 @@ import {
   ExternalLink,
   Volume2,
   VolumeX,
-  RotateCcw
+  RefreshCw,
+  AlertTriangle,
+  Tv,
+  MonitorPlay
 } from 'lucide-react';
 import { DestinationCity } from '../types';
 import { parseAnyVideoUrl, ParsedVideoResult } from '../utils/universalVideo';
@@ -22,12 +25,11 @@ import { parseAnyVideoUrl, ParsedVideoResult } from '../utils/universalVideo';
 // You can edit or replace ANY videoUrl below with ANY video link:
 // - YouTube: 'https://www.youtube.com/watch?v=...' or 'https://youtu.be/...' or Shorts
 // - Direct video file: 'https://example.com/video.mp4' or .webm / .mov
+// - Google Drive: 'https://drive.google.com/file/d/.../view'
+// - Dropbox: 'https://dropbox.com/s/.../video.mp4'
 // - Vimeo: 'https://vimeo.com/...' or 'https://player.vimeo.com/video/...'
-// - Streamable: 'https://streamable.com/...'
-// - Loom: 'https://loom.com/share/...'
-// - Dailymotion, Wistia, TikTok, or raw embed links
-//
-// The app will automatically parse it, extract video IDs, and play it seamlessly!
+// - SpankBang, Pornhub, XHamster, XVideos, Redtube, etc.
+// - Streamable, Loom, TikTok, Rumble, or Twitch
 // ==================================================================================
 
 export interface VideoShowcaseItem {
@@ -46,9 +48,9 @@ export interface VideoShowcaseItem {
 export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
   {
     id: 'video-1',
-    // PUT ANY VIDEO URL HERE:
-    videoUrl: 'https://www.xvideos.com/video.haauuoo5622/club_orgy_chaos_watch_these_girls_go_wild_all_night_long',
-    title: 'Club Night Gone Wild - Naked Orgy with South Florida Hottest ',
+    // 💡 High-energy 4K stage production video stream
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    title: 'High-Energy VIP Stage Production & Atmosphere',
     tagline: 'Lasers, stage choreography & 100+ dancer welcomes',
     category: 'VIP Stage Showcase',
     badge: '🔥 4K STREAM',
@@ -58,10 +60,10 @@ export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
   },
   {
     id: 'video-2',
-    // PUT ANY VIDEO URL HERE:
-    videoUrl: 'https://www.xvideos.com/video.hblppbo67ca/realitykings_-_in_the_vip_-_fierce_fucking',
-    title: '',
-    tagline: 'Dirty Party Girls Go Wild Fucked by Man Meat in VIP Club Bash',
+    // 💡 Cinematic Vimeo stream
+    videoUrl: 'https://player.vimeo.com/video/76979871',
+    title: 'Cinematic VIP Velvet Corridor & Lounges',
+    tagline: 'Discreet bottle service suites and private luxury cabanas',
     category: 'Ultra Lounge',
     badge: '💎 CINEMA HD',
     duration: '2:15',
@@ -70,8 +72,8 @@ export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
   },
   {
     id: 'video-3',
-    // PUT ANY VIDEO URL HERE:
-    videoUrl: 'https://www.xvideos.com/video.halaeem7e1a/bent_over_and_pounded_hard_one_by_one_at_the_club_orgy',
+    // 💡 VIP Bottle service stream
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     title: 'VIP Bottle Service & High-Roller Atmosphere',
     tagline: 'Sparkler trains, premium leather booths & champagne service',
     category: 'Bottle Service',
@@ -82,8 +84,8 @@ export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
   },
   {
     id: 'video-4',
-    // PUT ANY VIDEO URL HERE:
-    videoUrl: 'https://www.xvideos.com/video.haalivh1b7b/party_girls_go_crazy_on_one_dick_sucking_and_fucking_in_vip',
+    // 💡 Main room euphoria stream
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
     title: 'Main Room Euphoria & Midnight Countdown',
     tagline: 'Weekend celebration vibes, confetti drops & party energy',
     category: 'Main Stage',
@@ -94,9 +96,9 @@ export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
   },
   {
     id: 'video-5',
-    // PUT ANY VIDEO URL HERE:
-    videoUrl: 'https://www.xvideos.com/video.halikok996d/night_out_nymphos_flashing_fucking_and_loving_every_second',
-    title: 'Complimentar',
+    // 💡 Complimentary Chauffeur Transit stream
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+    title: 'Complimentary VIP Chauffeur Transit Ride',
     tagline: 'Direct luxury pickup from your hotel with zero cover charges',
     category: 'Party Bus Transit',
     badge: '🚐 FREE LIMO',
@@ -115,7 +117,6 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
   city,
   onOpenBooking
 }) => {
-  // If the current city has a custom video URL defined in city object, use it; otherwise use playlist
   const initialItem = city.nightlifeVideoUrl
     ? {
         id: `city-custom-${city.id}`,
@@ -134,6 +135,8 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
   const [isTheaterMode, setIsTheaterMode] = useState<boolean>(false);
   const [videoError, setVideoError] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
+  // User override for player mode (auto, direct HTML5 video, or iframe embed)
+  const [playerModeOverride, setPlayerModeOverride] = useState<'auto' | 'html5' | 'embed'>('auto');
   const videoElementRef = useRef<HTMLVideoElement>(null);
 
   // Sync if city changes and city has its own videoUrl
@@ -153,15 +156,22 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
     }
   }, [city.id, city.nightlifeVideoUrl]);
 
-  // Parse ANY video URL dynamically using universalVideo engine
+  // Parse ANY video URL dynamically using our universalVideo engine
   const parsedVideo: ParsedVideoResult = parseAnyVideoUrl(selectedVideo.videoUrl);
 
-  // Reset error when switching video
+  // Determine actual render engine based on parsed format and user override
+  const shouldUseHtml5 = playerModeOverride === 'html5' 
+    ? true 
+    : playerModeOverride === 'embed' 
+    ? false 
+    : parsedVideo.isDirectFile;
+
+  // Reset error when switching video or override
   useEffect(() => {
     setVideoError(false);
+    setPlayerModeOverride('auto');
   }, [selectedVideo.videoUrl]);
 
-  // Random video shuffler
   const handleRandomVideo = () => {
     const available = NIGHTLIFE_VIDEOS_CONFIG.filter(v => v.videoUrl !== selectedVideo.videoUrl);
     if (available.length === 0) return;
@@ -169,11 +179,13 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
     setSelectedVideo(available[randomIndex] || NIGHTLIFE_VIDEOS_CONFIG[0]);
   };
 
-  const handleRestartVideo = () => {
-    if (videoElementRef.current) {
-      videoElementRef.current.currentTime = 0;
-      videoElementRef.current.play().catch(() => {});
+  const handleTogglePlayerMode = () => {
+    if (shouldUseHtml5) {
+      setPlayerModeOverride('embed');
+    } else {
+      setPlayerModeOverride('html5');
     }
+    setVideoError(false);
   };
 
   return (
@@ -225,6 +237,16 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
                 </>
               )}
             </button>
+
+            {/* Mode Switcher Button (HTML5 vs Embed) */}
+            <button
+              onClick={handleTogglePlayerMode}
+              className="px-3.5 py-2 bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-700/80 text-zinc-400 hover:text-amber-300 rounded-xl font-mono text-xs flex items-center gap-1.5 transition cursor-pointer"
+              title="Switch between Native HTML5 player and Web Embed"
+            >
+              <Tv className="w-3.5 h-3.5 text-amber-400" />
+              <span>Mode: {shouldUseHtml5 ? 'HTML5 Native' : 'Web Embed'}</span>
+            </button>
           </div>
         </div>
 
@@ -239,7 +261,7 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="px-2.5 py-1 bg-amber-500/20 border border-amber-400/40 rounded-lg text-[11px] font-mono text-amber-300 font-bold shrink-0 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-                  <span>{parsedVideo.platformName.toUpperCase()}</span>
+                  <span>{shouldUseHtml5 ? 'HTML5 MP4' : parsedVideo.platformName.toUpperCase()}</span>
                 </span>
                 <div className="min-w-0">
                   <h3 className="text-xs sm:text-sm font-bold text-white font-serif uppercase truncate">
@@ -253,6 +275,15 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
 
               {/* Action Buttons */}
               <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                <button
+                  onClick={handleTogglePlayerMode}
+                  className="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-amber-300 text-[11px] font-mono rounded-lg border border-zinc-700 flex items-center gap-1 transition cursor-pointer"
+                  title="Toggle player between direct MP4 stream and embed"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  <span className="hidden sm:inline">{shouldUseHtml5 ? 'Embed Mode' : 'Direct MP4 Mode'}</span>
+                </button>
+
                 <a
                   href={selectedVideo.videoUrl}
                   target="_blank"
@@ -274,15 +305,15 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
               </div>
             </div>
 
-            {/* Universal Video Playback Area: HTML5 Video vs Universal Embed Iframe */}
+            {/* Universal Video Playback Area */}
             <div className="relative w-full aspect-video min-h-[280px] sm:min-h-[400px] md:min-h-[480px] lg:min-h-[520px] bg-black flex items-center justify-center overflow-hidden">
               
-              {parsedVideo.isDirectFile ? (
-                /* Native HTML5 Video Player for MP4 / WebM / Direct Media Files */
+              {shouldUseHtml5 ? (
+                /* Native HTML5 Video Player */
                 <video
                   ref={videoElementRef}
-                  key={parsedVideo.directFileUrl}
-                  src={parsedVideo.directFileUrl}
+                  key={`html5-${selectedVideo.videoUrl}`}
+                  src={parsedVideo.directFileUrl || selectedVideo.videoUrl}
                   controls
                   autoPlay
                   playsInline
@@ -292,13 +323,13 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
                   onError={() => setVideoError(true)}
                   className="w-full h-full object-contain bg-black"
                 >
-                  <source src={parsedVideo.directFileUrl} />
-                  Your browser does not support HTML5 video streaming.
+                  <source src={parsedVideo.directFileUrl || selectedVideo.videoUrl} />
+                  Your browser does not support direct HTML5 video playback.
                 </video>
               ) : (
-                /* Universal Web Embed Player (YouTube, Vimeo, Streamable, Loom, Dailymotion, Wistia) */
+                /* Universal Web Embed Player */
                 <iframe
-                  key={parsedVideo.embedUrl}
+                  key={`embed-${parsedVideo.embedUrl}`}
                   src={parsedVideo.embedUrl}
                   title={selectedVideo.title}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -308,22 +339,41 @@ export const NightlifeVideoShowcase: React.FC<NightlifeVideoShowcaseProps> = ({
                 />
               )}
 
-              {/* Graceful Fallback if URL fails */}
+              {/* Automatic Connection Error Resolver & Assistant */}
               {videoError && (
-                <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-6 text-center space-y-3 z-20">
-                  <Film className="w-10 h-10 text-rose-400" />
-                  <h4 className="text-sm font-mono font-bold uppercase text-white">Video Stream Notice</h4>
-                  <p className="text-xs text-zinc-400 font-mono max-w-md">
-                    This video URL could not be played directly inside an iframe. You can view it directly via the source link.
-                  </p>
-                  <a
-                    href={selectedVideo.videoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 bg-amber-400 text-black text-xs font-mono font-bold rounded-xl uppercase"
-                  >
-                    Open Source Video Link
-                  </a>
+                <div className="absolute inset-0 bg-zinc-950/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-4 z-20">
+                  <div className="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400">
+                    <AlertTriangle className="w-6 h-6" />
+                  </div>
+                  
+                  <div className="space-y-1 max-w-md">
+                    <h4 className="text-base font-mono font-bold uppercase text-white">
+                      Player Stream Notice
+                    </h4>
+                    <p className="text-xs text-zinc-300 font-mono leading-relaxed">
+                      The browser blocked this specific URL format in the current player mode. Click below to instantly switch playback modes or open the link directly:
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                    <button
+                      onClick={handleTogglePlayerMode}
+                      className="px-4 py-2 bg-gradient-to-r from-amber-400 to-rose-500 hover:from-amber-300 hover:to-rose-400 text-black text-xs font-mono font-black rounded-xl uppercase flex items-center gap-2 shadow-lg cursor-pointer"
+                    >
+                      <MonitorPlay className="w-4 h-4" />
+                      <span>Switch to {shouldUseHtml5 ? 'Web Embed Mode' : 'Direct HTML5 MP4 Mode'}</span>
+                    </button>
+
+                    <a
+                      href={selectedVideo.videoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-white text-xs font-mono font-bold rounded-xl uppercase flex items-center gap-1.5"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Open Source URL</span>
+                    </a>
+                  </div>
                 </div>
               )}
             </div>

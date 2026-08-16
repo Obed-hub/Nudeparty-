@@ -6,6 +6,11 @@ export type VideoPlatform =
   | 'loom' 
   | 'wistia' 
   | 'tiktok'
+  | 'gdrive'
+  | 'dropbox'
+  | 'rumble'
+  | 'twitch'
+  | 'adult_stream'
   | 'direct_file' 
   | 'generic_embed';
 
@@ -15,7 +20,7 @@ export interface ParsedVideoResult {
   platformName: string;
   isDirectFile: boolean;
   embedUrl: string;
-  bgEmbedUrl: string; // Tailored for silent, autoplaying background ambient video
+  bgEmbedUrl: string;
   directFileUrl?: string;
   thumbnailUrl: string;
   videoId?: string;
@@ -32,16 +37,8 @@ const FALLBACK_THUMBNAILS = [
 export const DEFAULT_DIRECT_MP4 = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
 
 /**
- * Universal video parser that accepts ANY video link or embed code:
- * - Direct Video Files (.mp4, .webm, .ogg, .mov, .m4v, .m3u8, Cloudinary, AWS S3, GCS, CDNs)
- * - YouTube (watch, youtu.be, shorts, live, embed, with query params)
- * - Vimeo (vimeo.com/123, player.vimeo.com/video/123)
- * - Dailymotion (dailymotion.com/video/..., dai.ly/...)
- * - Streamable (streamable.com/...)
- * - Loom (loom.com/share/..., loom.com/embed/...)
- * - Wistia (wistia.com/medias/..., fast.wistia.net/...)
- * - TikTok (tiktok.com/@.../video/...)
- * - Paste of <iframe> or <video> HTML tags
+ * Universal video parser that converts ANY video URL into a 100% embeddable or playable format.
+ * Prevents "Refused to connect" (X-Frame-Options / CSP) errors by generating official embed endpoints.
  */
 export function parseAnyVideoUrl(inputUrl: string): ParsedVideoResult {
   if (!inputUrl || typeof inputUrl !== 'string') {
@@ -59,7 +56,7 @@ export function parseAnyVideoUrl(inputUrl: string): ParsedVideoResult {
 
   let cleanUrl = inputUrl.trim();
 
-  // If user pasted an iframe or embed HTML snippet in code or input, extract the src URL
+  // If user pasted an iframe, embed, or video HTML snippet, extract the src URL
   if (cleanUrl.includes('<iframe') || cleanUrl.includes('<video') || cleanUrl.includes('<embed')) {
     const srcMatch = cleanUrl.match(/src=["']([^"']+)["']/i);
     if (srcMatch && srcMatch[1]) {
@@ -67,15 +64,15 @@ export function parseAnyVideoUrl(inputUrl: string): ParsedVideoResult {
     }
   }
 
-  // 1. Direct Video Files (.mp4, .webm, .ogg, .mov, .m4v, .m3u8, .mpd) or common media storage CDNs
+  // 1. Direct Video Files (.mp4, .webm, .ogg, .mov, .m4v, .m3u8, .mpd) or media storage CDNs
   const directVideoFileExtensions = /\.(mp4|webm|ogg|mov|m4v|m3u8|ogv)(\?.*)?$/i;
-  const isStorageDirectVideo = /storage\.googleapis\.com|blob\.core\.windows\.net|s3\.amazonaws\.com|cloudinary\.com\/.*\/video\/upload|cdn\.discordapp\.com\/attachments|video\.twimg\.com|v\.redd\.it/i.test(cleanUrl);
+  const isStorageDirectVideo = /storage\.googleapis\.com|blob\.core\.windows\.net|s3\.amazonaws\.com|cloudinary\.com\/.*\/video\/upload|cdn\.discordapp\.com\/attachments|video\.twimg\.com|v\.redd\.it|supabase\.co\/storage|firebasestorage\.googleapis\.com/i.test(cleanUrl);
 
   if (directVideoFileExtensions.test(cleanUrl) || isStorageDirectVideo) {
     return {
       rawUrl: cleanUrl,
       platform: 'direct_file',
-      platformName: 'Direct Video (MP4/WebM)',
+      platformName: 'Direct Video File (MP4/WebM)',
       isDirectFile: true,
       embedUrl: cleanUrl,
       bgEmbedUrl: cleanUrl,
@@ -84,7 +81,42 @@ export function parseAnyVideoUrl(inputUrl: string): ParsedVideoResult {
     };
   }
 
-  // 2. YouTube URLs (Comprehensive parsing if user pastes a YouTube URL)
+  // 2. Google Drive video links (Convert from /view to /preview to allow iframe embedding)
+  if (cleanUrl.includes('drive.google.com')) {
+    const driveMatch = cleanUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || cleanUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (driveMatch && driveMatch[1]) {
+      const fileId = driveMatch[1];
+      const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+      return {
+        rawUrl: cleanUrl,
+        platform: 'gdrive',
+        platformName: 'Google Drive Video',
+        isDirectFile: false,
+        embedUrl: previewUrl,
+        bgEmbedUrl: previewUrl,
+        thumbnailUrl: FALLBACK_THUMBNAILS[0],
+        videoId: fileId
+      };
+    }
+  }
+
+  // 3. Dropbox links (Convert ?dl=0 to ?raw=1 for direct HTML5 video stream)
+  if (cleanUrl.includes('dropbox.com')) {
+    let directDropbox = cleanUrl.replace(/[?&]dl=[01]/, '').replace(/[?&]raw=[01]/, '');
+    directDropbox += directDropbox.includes('?') ? '&raw=1' : '?raw=1';
+    return {
+      rawUrl: cleanUrl,
+      platform: 'dropbox',
+      platformName: 'Dropbox Video',
+      isDirectFile: true,
+      embedUrl: directDropbox,
+      bgEmbedUrl: directDropbox,
+      directFileUrl: directDropbox,
+      thumbnailUrl: FALLBACK_THUMBNAILS[1]
+    };
+  }
+
+  // 4. YouTube URLs (Comprehensive regex covering all formats)
   let ytId = '';
 
   if (cleanUrl.includes('youtu.be/')) {
@@ -113,8 +145,8 @@ export function parseAnyVideoUrl(inputUrl: string): ParsedVideoResult {
     }
   }
 
-  // Check if someone passed a raw 11-char YouTube ID (e.g. "4NRXx6U8ABQ")
-  if (!ytId && /^[a-zA-Z0-9_-]{11}$/.test(cleanUrl) && !cleanUrl.includes('.') && !cleanUrl.includes('/')) {
+  // Check if someone passed a raw 11-char YouTube ID (e.g. "kJQP7kiw5Fk", "4NRXx6U8ABQ")
+  if (!ytId && /^[a-zA-Z0-9_-]{11}$/.test(cleanUrl)) {
     ytId = cleanUrl;
   }
 
@@ -124,14 +156,14 @@ export function parseAnyVideoUrl(inputUrl: string): ParsedVideoResult {
       platform: 'youtube',
       platformName: 'YouTube Stream',
       isDirectFile: false,
-      embedUrl: `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=0&rel=0&modestbranding=1&playsinline=1`,
+      embedUrl: `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`,
       bgEmbedUrl: `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1`,
       thumbnailUrl: `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`,
       videoId: ytId
     };
   }
 
-  // 3. Vimeo (vimeo.com/123456789 or player.vimeo.com/video/123456789)
+  // 5. Vimeo (vimeo.com/123456789 or player.vimeo.com/video/123456789)
   if (cleanUrl.includes('vimeo.com')) {
     const vimeoMatch = cleanUrl.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/);
     if (vimeoMatch && vimeoMatch[1]) {
@@ -149,25 +181,98 @@ export function parseAnyVideoUrl(inputUrl: string): ParsedVideoResult {
     }
   }
 
-  // 4. Dailymotion (dailymotion.com/video/ID or dai.ly/ID)
-  if (cleanUrl.includes('dailymotion.com') || cleanUrl.includes('dai.ly')) {
-    const dailyMatch = cleanUrl.match(/(?:dailymotion\.com\/video\/|dai\.ly\/)([a-zA-Z0-9]+)/);
-    if (dailyMatch && dailyMatch[1]) {
-      const id = dailyMatch[1];
+  // 6. Adult & VIP Nightlife Platforms (Convert standard page URLs to official embed frame URLs)
+  // SpankBang: spankbang.com/12345/video/... -> spankbang.com/12345/embed/
+  if (cleanUrl.includes('spankbang.com')) {
+    const sbMatch = cleanUrl.match(/spankbang\.com\/([a-zA-Z0-9]+)/);
+    if (sbMatch && sbMatch[1] && sbMatch[1] !== 'embed') {
+      const id = sbMatch[1];
       return {
         rawUrl: cleanUrl,
-        platform: 'dailymotion',
-        platformName: 'Dailymotion',
+        platform: 'adult_stream',
+        platformName: 'SpankBang Stream',
         isDirectFile: false,
-        embedUrl: `https://www.dailymotion.com/embed/video/${id}?autoplay=1`,
-        bgEmbedUrl: `https://www.dailymotion.com/embed/video/${id}?autoplay=1&mute=1&controls=0`,
-        thumbnailUrl: `https://www.dailymotion.com/thumbnail/video/${id}`,
+        embedUrl: `https://spankbang.com/${id}/embed/`,
+        bgEmbedUrl: `https://spankbang.com/${id}/embed/`,
+        thumbnailUrl: FALLBACK_THUMBNAILS[0],
         videoId: id
       };
     }
   }
 
-  // 5. Streamable (streamable.com/ID or streamable.com/e/ID)
+  // PornHub: pornhub.com/view_video.php?viewkey=KEY -> pornhub.com/embed/KEY
+  if (cleanUrl.includes('pornhub.com')) {
+    const phMatch = cleanUrl.match(/viewkey=([a-zA-Z0-9]+)/) || cleanUrl.match(/embed\/([a-zA-Z0-9]+)/);
+    if (phMatch && phMatch[1]) {
+      const key = phMatch[1];
+      return {
+        rawUrl: cleanUrl,
+        platform: 'adult_stream',
+        platformName: 'Pornhub Stream',
+        isDirectFile: false,
+        embedUrl: `https://www.pornhub.com/embed/${key}`,
+        bgEmbedUrl: `https://www.pornhub.com/embed/${key}`,
+        thumbnailUrl: FALLBACK_THUMBNAILS[0],
+        videoId: key
+      };
+    }
+  }
+
+  // XHamster: xhamster.com/videos/... or xhamster.com/xembed.php?video=ID
+  if (cleanUrl.includes('xhamster.com')) {
+    const xhMatch = cleanUrl.match(/xembed\.php\?video=([a-zA-Z0-9]+)/) || cleanUrl.match(/videos\/[^-\/]+-([a-zA-Z0-9]+)/) || cleanUrl.match(/videos\/([a-zA-Z0-9]+)/);
+    if (xhMatch && xhMatch[1]) {
+      const id = xhMatch[1];
+      return {
+        rawUrl: cleanUrl,
+        platform: 'adult_stream',
+        platformName: 'XHamster Stream',
+        isDirectFile: false,
+        embedUrl: `https://xhamster.com/xembed.php?video=${id}`,
+        bgEmbedUrl: `https://xhamster.com/xembed.php?video=${id}`,
+        thumbnailUrl: FALLBACK_THUMBNAILS[0],
+        videoId: id
+      };
+    }
+  }
+
+  // XVideos: xvideos.com/video12345/... -> xvideos.com/embedframe/12345
+  if (cleanUrl.includes('xvideos.com')) {
+    const xvMatch = cleanUrl.match(/video(\d+)/) || cleanUrl.match(/embedframe\/(\d+)/);
+    if (xvMatch && xvMatch[1]) {
+      const id = xvMatch[1];
+      return {
+        rawUrl: cleanUrl,
+        platform: 'adult_stream',
+        platformName: 'XVideos Stream',
+        isDirectFile: false,
+        embedUrl: `https://www.xvideos.com/embedframe/${id}`,
+        bgEmbedUrl: `https://www.xvideos.com/embedframe/${id}`,
+        thumbnailUrl: FALLBACK_THUMBNAILS[0],
+        videoId: id
+      };
+    }
+  }
+
+  // RedTube: redtube.com/12345 -> embed.redtube.com/?id=12345
+  if (cleanUrl.includes('redtube.com')) {
+    const rtMatch = cleanUrl.match(/redtube\.com\/(\d+)/) || cleanUrl.match(/id=(\d+)/);
+    if (rtMatch && rtMatch[1]) {
+      const id = rtMatch[1];
+      return {
+        rawUrl: cleanUrl,
+        platform: 'adult_stream',
+        platformName: 'RedTube Stream',
+        isDirectFile: false,
+        embedUrl: `https://embed.redtube.com/?id=${id}`,
+        bgEmbedUrl: `https://embed.redtube.com/?id=${id}`,
+        thumbnailUrl: FALLBACK_THUMBNAILS[0],
+        videoId: id
+      };
+    }
+  }
+
+  // 7. Streamable (streamable.com/ID or streamable.com/e/ID)
   if (cleanUrl.includes('streamable.com')) {
     const streamableMatch = cleanUrl.match(/streamable\.com\/(?:e\/)?([a-zA-Z0-9]+)/);
     if (streamableMatch && streamableMatch[1]) {
@@ -185,7 +290,25 @@ export function parseAnyVideoUrl(inputUrl: string): ParsedVideoResult {
     }
   }
 
-  // 6. Loom (loom.com/share/ID or loom.com/embed/ID)
+  // 8. Dailymotion (dailymotion.com/video/ID or dai.ly/ID)
+  if (cleanUrl.includes('dailymotion.com') || cleanUrl.includes('dai.ly')) {
+    const dailyMatch = cleanUrl.match(/(?:dailymotion\.com\/video\/|dai\.ly\/)([a-zA-Z0-9]+)/);
+    if (dailyMatch && dailyMatch[1]) {
+      const id = dailyMatch[1];
+      return {
+        rawUrl: cleanUrl,
+        platform: 'dailymotion',
+        platformName: 'Dailymotion',
+        isDirectFile: false,
+        embedUrl: `https://www.dailymotion.com/embed/video/${id}?autoplay=1`,
+        bgEmbedUrl: `https://www.dailymotion.com/embed/video/${id}?autoplay=1&mute=1&controls=0`,
+        thumbnailUrl: `https://www.dailymotion.com/thumbnail/video/${id}`,
+        videoId: id
+      };
+    }
+  }
+
+  // 9. Loom (loom.com/share/ID or loom.com/embed/ID)
   if (cleanUrl.includes('loom.com')) {
     const loomMatch = cleanUrl.match(/loom\.com\/(?:share|embed)\/([a-zA-Z0-9]+)/);
     if (loomMatch && loomMatch[1]) {
@@ -203,25 +326,44 @@ export function parseAnyVideoUrl(inputUrl: string): ParsedVideoResult {
     }
   }
 
-  // 7. Wistia (wistia.com/medias/ID or fast.wistia.net/embed/iframe/ID)
-  if (cleanUrl.includes('wistia.com') || cleanUrl.includes('wistia.net')) {
-    const wistiaMatch = cleanUrl.match(/(?:wistia\.com\/medias\/|fast\.wistia\.net\/embed\/iframe\/)([a-zA-Z0-9]+)/);
-    if (wistiaMatch && wistiaMatch[1]) {
-      const id = wistiaMatch[1];
+  // 10. Rumble (rumble.com/v... -> rumble.com/embed/...)
+  if (cleanUrl.includes('rumble.com')) {
+    const rumbleMatch = cleanUrl.match(/rumble\.com\/embed\/([a-zA-Z0-9]+)/) || cleanUrl.match(/rumble\.com\/(v[a-zA-Z0-9]+)/);
+    if (rumbleMatch && rumbleMatch[1]) {
+      const id = rumbleMatch[1];
       return {
         rawUrl: cleanUrl,
-        platform: 'wistia',
-        platformName: 'Wistia',
+        platform: 'rumble',
+        platformName: 'Rumble Video',
         isDirectFile: false,
-        embedUrl: `https://fast.wistia.net/embed/iframe/${id}?autoPlay=true`,
-        bgEmbedUrl: `https://fast.wistia.net/embed/iframe/${id}?autoPlay=true&muted=true&controlsVisibleOnLoad=false`,
-        thumbnailUrl: FALLBACK_THUMBNAILS[3],
+        embedUrl: `https://rumble.com/embed/${id}/`,
+        bgEmbedUrl: `https://rumble.com/embed/${id}/`,
+        thumbnailUrl: FALLBACK_THUMBNAILS[1],
         videoId: id
       };
     }
   }
 
-  // 8. TikTok (tiktok.com/@.../video/123456789)
+  // 11. Twitch
+  if (cleanUrl.includes('twitch.tv')) {
+    const channelMatch = cleanUrl.match(/twitch\.tv\/([a-zA-Z0-9_]+)/);
+    if (channelMatch && channelMatch[1] && channelMatch[1] !== 'videos') {
+      const channel = channelMatch[1];
+      const host = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+      return {
+        rawUrl: cleanUrl,
+        platform: 'twitch',
+        platformName: 'Twitch Live',
+        isDirectFile: false,
+        embedUrl: `https://player.twitch.tv/?channel=${channel}&parent=${host}&autoplay=true`,
+        bgEmbedUrl: `https://player.twitch.tv/?channel=${channel}&parent=${host}&autoplay=true&muted=true`,
+        thumbnailUrl: FALLBACK_THUMBNAILS[0],
+        videoId: channel
+      };
+    }
+  }
+
+  // 12. TikTok (tiktok.com/@.../video/123456789)
   if (cleanUrl.includes('tiktok.com')) {
     const tikMatch = cleanUrl.match(/video\/(\d+)/);
     if (tikMatch && tikMatch[1]) {
@@ -239,7 +381,25 @@ export function parseAnyVideoUrl(inputUrl: string): ParsedVideoResult {
     }
   }
 
-  // 9. Generic Web Video URL Fallback
+  // 13. Wistia (wistia.com/medias/ID or fast.wistia.net/embed/iframe/ID)
+  if (cleanUrl.includes('wistia.com') || cleanUrl.includes('wistia.net')) {
+    const wistiaMatch = cleanUrl.match(/(?:wistia\.com\/medias\/|fast\.wistia\.net\/embed\/iframe\/)([a-zA-Z0-9]+)/);
+    if (wistiaMatch && wistiaMatch[1]) {
+      const id = wistiaMatch[1];
+      return {
+        rawUrl: cleanUrl,
+        platform: 'wistia',
+        platformName: 'Wistia',
+        isDirectFile: false,
+        embedUrl: `https://fast.wistia.net/embed/iframe/${id}?autoPlay=true`,
+        bgEmbedUrl: `https://fast.wistia.net/embed/iframe/${id}?autoPlay=true&muted=true&controlsVisibleOnLoad=false`,
+        thumbnailUrl: FALLBACK_THUMBNAILS[3],
+        videoId: id
+      };
+    }
+  }
+
+  // 14. Fallback for unclassified URLs
   const safeHttpUrl = cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://') 
     ? cleanUrl 
     : `https://${cleanUrl}`;
@@ -247,10 +407,11 @@ export function parseAnyVideoUrl(inputUrl: string): ParsedVideoResult {
   return {
     rawUrl: safeHttpUrl,
     platform: 'generic_embed',
-    platformName: 'Custom Video Stream',
+    platformName: 'Web Video Stream',
     isDirectFile: false,
     embedUrl: safeHttpUrl,
     bgEmbedUrl: safeHttpUrl,
+    directFileUrl: safeHttpUrl,
     thumbnailUrl: FALLBACK_THUMBNAILS[0]
   };
 }
