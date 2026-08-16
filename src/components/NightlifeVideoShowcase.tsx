@@ -48,7 +48,7 @@ export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
     id: 'video-1',
     // PUT ANY VIDEO URL HERE:
     videoUrl: 'https://www.xvideos.com/video.haauuoo5622/club_orgy_chaos_watch_these_girls_go_wild_all_night_long',
-    title: 'Club Night Gone Wild - Naked Orgy with South Florida's Hottest ',
+    title: 'Club Night Gone Wild - Naked Orgy with South Florida Hottest ',
     tagline: 'Lasers, stage choreography & 100+ dancer welcomes',
     category: 'VIP Stage Showcase',
     badge: '🔥 4K STREAM',
