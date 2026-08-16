@@ -1,0 +1,6 @@
+{
+  "name": "PartyPass 18+ Event Portal",
+  "description": "Exclusive 18+ naturist & clothing-optional party RSVP and event management portal with verified age checks, country/state location selector, comfort level preferences, towel & privacy policy agreements, digital party pass generator, live lineup, and song request queue.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
