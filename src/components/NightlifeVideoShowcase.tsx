@@ -75,7 +75,7 @@ export function getYouTubeEmbedUrl(videoLink: string): string {
     const parts = trimmed.split('youtube.com/shorts/');
     if (parts[1]) {
       const id = parts[1].split('?')[0].split('/')[0];
-      return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=0&rel=0&modestbranding=1&playsinline=1`;
+      return `https://www.xvideos.com/video.ooevdao9269/_ai-generated_elite_strip_club_slave_girls_obedient_naked_dancers_sex_rave_watch_with_sound_music_video`;
     }
   }
 
@@ -91,13 +91,13 @@ export function getYouTubeThumbnailUrl(videoLink: string): string {
   if (match && match[1]) {
     return `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`;
   }
-  return 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800&auto=format&fit=crop';
+  return 'https://www.xvideos.com/video.halpitd4e9c/these_party_girls_get_dirtier_than_south_florida_s_wildest_nights';
 }
 
 export const YOUTUBE_NIGHTLIFE_VIDEOS: YouTubeTeaser[] = [
   {
     id: 'yt-vegas-lights',
-    videoUrl: 'https://www.youtube.com/watch?v=4NRXx6U8ABQ',
+    videoUrl: 'https://www.xvideos.com/video.opvblva6d84/_ai-generated_face_down_-_music_video_wild_naked_dancers_in_strip_club_rave_party_-_short_teaser_striptease_and_nude_dance',
     title: 'Neon Nights & VIP Strip Atmosphere',
     tagline: 'High-energy neon lighting, stage choreography, laser shows & 100+ performers',
     category: 'VIP Stage Show',
@@ -108,7 +108,7 @@ export const YOUTUBE_NIGHTLIFE_VIDEOS: YouTubeTeaser[] = [
   },
   {
     id: 'yt-masquerade',
-    videoUrl: 'https://www.youtube.com/watch?v=k2qgadSvNyU',
+    videoUrl: 'https://www.xvideos.com/video.oppvftb40d9/_ai-generated_-_music_video_close_contact_-_naked_dancers_strip_club_striptease_and_naked_dances_watch_with_sound_',
     title: 'VIP Masquerade & Ultra Cabaret Suite',
     tagline: 'Anonymous VIP booths, sparkler bottle service, private cabanas & glamour',
     category: 'Ultra Lounge',
@@ -119,7 +119,7 @@ export const YOUTUBE_NIGHTLIFE_VIDEOS: YouTubeTeaser[] = [
   },
   {
     id: 'yt-partybus',
-    videoUrl: 'https://www.youtube.com/watch?v=OPf0YbXqDm0',
+    videoUrl: 'https://www.xvideos.com/video.mdcavk00ad/very_sexy_gangbang_in_club',
     title: 'Free Luxury VIP Party Bus & Transit Experience',
     tagline: 'Complimentary hotel pickup, sound systems, LED mood lights & drink stops',
     category: 'Party Bus Transit',
@@ -130,7 +130,7 @@ export const YOUTUBE_NIGHTLIFE_VIDEOS: YouTubeTeaser[] = [
   },
   {
     id: 'yt-club-energy',
-    videoUrl: 'https://www.youtube.com/watch?v=fRh_vgS2dFE',
+    videoUrl: 'https://www.xvideos.com/video.hblppbo67ca/realitykings_-_in_the_vip_-_fierce_fucking',
     title: 'Catwalk Runway & Stage Dance Showcase',
     tagline: 'World-class choreography, center-stage spotlight roasts & dancer welcomes',
     category: 'Runway Catwalk',
@@ -141,7 +141,7 @@ export const YOUTUBE_NIGHTLIFE_VIDEOS: YouTubeTeaser[] = [
   },
   {
     id: 'yt-festival-edm',
-    videoUrl: 'https://www.youtube.com/watch?v=60ItHLz5WEA',
+    videoUrl: 'https://www.xvideos.com/video.halpitd4e9c/these_party_girls_get_dirtier_than_south_florida_s_wildest_nights',
     title: 'Laser Spectacular & Main Room Euphoria',
     tagline: 'Stunning visual production, bass drops & unmatched weekend party energy',
     category: 'Main Stage',
@@ -152,7 +152,7 @@ export const YOUTUBE_NIGHTLIFE_VIDEOS: YouTubeTeaser[] = [
   },
   {
     id: 'yt-latin-heat',
-    videoUrl: 'https://www.youtube.com/watch?v=kJQP7kiw5Fk',
+    videoUrl: 'https://www.xvideos.com/video.ooevdao9269/_ai-generated_elite_strip_club_slave_girls_obedient_naked_dancers_sex_rave_watch_with_sound_music_video',
     title: 'Tropical Midnight & Latin Beats Lounge',
     tagline: 'Sensual rhythms, craft cocktail mixes, VIP suites & island party vibes',
     category: 'VIP Cabaret',
