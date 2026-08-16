@@ -47,7 +47,7 @@ export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
   {
     id: 'video-1',
     // PUT ANY VIDEO URL HERE:
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    videoUrl: 'https://www.xvideos.com/video.haauuoo5622/club_orgy_chaos_watch_these_girls_go_wild_all_night_long',
     title: 'High-Energy VIP Stage Production & Atmosphere',
     tagline: 'Lasers, stage choreography & 100+ dancer welcomes',
     category: 'VIP Stage Showcase',
@@ -59,7 +59,7 @@ export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
   {
     id: 'video-2',
     // PUT ANY VIDEO URL HERE:
-    videoUrl: 'https://player.vimeo.com/video/76979871',
+    videoUrl: 'https://www.xvideos.com/video.hblppbo67ca/realitykings_-_in_the_vip_-_fierce_fucking',
     title: 'Cinematic VIP Velvet Corridor & Lounges',
     tagline: 'Discreet bottle service suites and private luxury cabanas',
     category: 'Ultra Lounge',
@@ -71,7 +71,7 @@ export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
   {
     id: 'video-3',
     // PUT ANY VIDEO URL HERE:
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    videoUrl: 'https://www.xvideos.com/video.halaeem7e1a/bent_over_and_pounded_hard_one_by_one_at_the_club_orgy',
     title: 'VIP Bottle Service & High-Roller Atmosphere',
     tagline: 'Sparkler trains, premium leather booths & champagne service',
     category: 'Bottle Service',
@@ -83,7 +83,7 @@ export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
   {
     id: 'video-4',
     // PUT ANY VIDEO URL HERE:
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+    videoUrl: 'https://www.xvideos.com/video.haalivh1b7b/party_girls_go_crazy_on_one_dick_sucking_and_fucking_in_vip',
     title: 'Main Room Euphoria & Midnight Countdown',
     tagline: 'Weekend celebration vibes, confetti drops & party energy',
     category: 'Main Stage',
@@ -95,7 +95,7 @@ export const NIGHTLIFE_VIDEOS_CONFIG: VideoShowcaseItem[] = [
   {
     id: 'video-5',
     // PUT ANY VIDEO URL HERE:
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+    videoUrl: 'https://www.xvideos.com/video.halikok996d/night_out_nymphos_flashing_fucking_and_loving_every_second',
     title: 'Complimentary VIP Chauffeur Transit Ride',
     tagline: 'Direct luxury pickup from your hotel with zero cover charges',
     category: 'Party Bus Transit',
